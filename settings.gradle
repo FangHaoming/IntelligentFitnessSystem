@@ -1,0 +1,3 @@
+rootProject.name = "Intelligent Fitness System"
+include ':app'
+include ':sdk'
