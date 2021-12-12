@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.VideoFrame;
 import com.example.intelligentfitnesssystem.utils.SendFrameThread;
+import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -73,24 +74,35 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
         iv=root.findViewById(R.id.iv);
         Timer timer=new Timer();
 
+        //ConnectionInfo info=new ConnectionInfo("104.238.184.237",8080);
+
+
         onButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openCamera();
-                try {
-                    //172.16.213.177
-                    thread=new SendFrameThread("172.16.51.247",8004);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                thread.start();
+//                openCamera();
+//                try {
+//                    //172.16.213.177
+//                    thread=new SendFrameThread("172.16.51.247",8004);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                thread.start();
+
+
+            }
+        });
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
                 TimerTask task=new TimerTask() {
                     @Override
                     public void run() {
                         requireActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Log.i("timer frames.size()=",frames.size()+"");
+                                Log.i("timer rf.size()=",rf.size()+"");
                                 rf=thread.getReturnFrames();
                                 if(i_rf< rf.size()){
                                     Log.i("timer i=",i_rf+"");
@@ -106,11 +118,6 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
                 }else{
                     timer.cancel();
                 }
-            }
-        });
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 camera.stopPreview();
                 releaseCamera(camera);
                 try {
@@ -118,7 +125,6 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         });
         return root;
