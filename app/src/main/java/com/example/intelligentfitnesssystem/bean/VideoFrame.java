@@ -4,7 +4,9 @@ import android.util.Log;
 
 import android.util.Log;
 
-public class VideoFrame {
+import com.xuhao.didi.core.iocore.interfaces.ISendable;
+
+public class VideoFrame implements ISendable {
     private final String formatLen;
     private final int len;
     private final byte[] data;
@@ -41,4 +43,8 @@ public class VideoFrame {
         this.data = data;
     }
 
+    @Override
+    public byte[] parse() {
+        return new byte[0];
+    }
 }

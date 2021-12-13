@@ -35,5 +35,7 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    api 'com.tonystark.android:socket:latest.release'
+    api 'com.tonystark.android:socket:4.2.3'
+    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
+    implementation 'com.alibaba:fastjson:1.2.48'
 }

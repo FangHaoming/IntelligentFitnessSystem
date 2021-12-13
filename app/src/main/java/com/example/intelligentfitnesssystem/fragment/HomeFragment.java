@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -16,27 +17,49 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
 import androidx.fragment.app.Fragment;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.example.intelligentfitnesssystem.R;
+import com.example.intelligentfitnesssystem.bean.MyResponse;
+import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.bean.VideoFrame;
+import com.example.intelligentfitnesssystem.utils.OkSocketSendData;
 import com.example.intelligentfitnesssystem.utils.SendFrameThread;
+import com.xuhao.didi.core.iocore.interfaces.ISendable;
+import com.xuhao.didi.core.pojo.OriginalData;
+import com.xuhao.didi.core.protocol.IReaderProtocol;
+import com.xuhao.didi.socket.client.sdk.OkSocket;
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo;
+import com.xuhao.didi.socket.client.sdk.client.OkSocketOptions;
+import com.xuhao.didi.socket.client.sdk.client.action.SocketActionAdapter;
+import com.xuhao.didi.socket.client.sdk.client.connection.IConnectionManager;
+
+
+import org.opencv.ml.LogisticRegression;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
 
@@ -53,6 +76,8 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
     private LinkedList<VideoFrame> rf=new LinkedList<>();
     private int i_rf=0;
     private ImageView iv;
+    private Boolean isClose=true;
+    private Thread sendFrameThread;
 
 
     @Override
@@ -74,28 +99,120 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
         iv=root.findViewById(R.id.iv);
         Timer timer=new Timer();
 
-        //ConnectionInfo info=new ConnectionInfo("104.238.184.237",8080);
+        ConnectionInfo info = new ConnectionInfo("172.16.213.177", 8004);
+        IConnectionManager manager= OkSocket.open(info);
+        OkSocketOptions options=manager.getOption();
+        OkSocketOptions.Builder builder=new OkSocketOptions.Builder(options);
+        builder.setReaderProtocol(new IReaderProtocol() {
+            @Override
+            public int getHeaderLength() {
+                return 16;
+            }
+            @Override
+            public int getBodyLength(byte[] header, ByteOrder byteOrder) {
+                return Integer.parseInt(new String(header).trim());
+            }
+        });
+        manager.option(builder.build());
+        manager.registerReceiver(new SocketActionAdapter() {
+            @Override
+            public void onSocketConnectionSuccess(ConnectionInfo info, String action) {
+                super.onSocketConnectionSuccess(info, action);
+                Log.i("socket***conn","connected");
 
+                isClose=false;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                        } catch (RuntimeException e) {
+                            e.printStackTrace();
+                        }
 
+                        //获取相机参数
+                        Camera.Parameters parameters = camera.getParameters();
+                        //获取相机支持的预览的大小
+                        //Camera.Size previewSize = getCameraPreviewSize(parameters);
+                        int width = 640;// previewSizFe.width;
+                        int height = 480;// previewSize.height;
+                        //设置预览格式（也就是每一帧的视频格式）YUV420下的NV21
+                        parameters.setPreviewFormat(ImageFormat.NV21);
+                        List<int[]> fps=parameters.getSupportedPreviewFpsRange();
+                        parameters.setPreviewFpsRange(fps.get(0)[0],fps.get(0)[1]);
+                        //设置预览图像分辨率
+                        parameters.setPreviewSize(width, height);
+                        //相机旋转90度
+                        camera.setDisplayOrientation(90);
+                        //配置camera参数
+                        camera.setParameters(parameters);
+                        try {
+                            camera.setPreviewDisplay(holder);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        OkSocketSendData s=new OkSocketSendData();
+                        //设置监听获取视频流的每一帧
+                        camera.setPreviewCallback(new Camera.PreviewCallback() {
+                            @Override
+                            public void onPreviewFrame(byte[] data, Camera camera) {
+                                if (manager.isDisconnecting()) return;
+                                YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, width, height, null);
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                yuvimage.compressToJpeg(new Rect(0, 0, width, height), 80, baos);
+                                Bitmap bmp = BitmapFactory.decodeByteArray(baos.toByteArray(), 0, baos.toByteArray().length);
+                                bmp.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+
+                                int len=baos.toByteArray().length;
+                                String d=new String(baos.toByteArray());
+
+                                Log.i("socket***sendLen", len+"");
+                                Log.i("socket***sendData", d);
+                                s.setVideoFrame(baos.toByteArray().length,baos.toByteArray());
+
+                                byte[] res=s.parse();
+                                manager.send(s);
+                            }
+                        });
+                        //调用startPreview()用以更新preview的surface
+                        camera.startPreview();
+                    }
+                }).start();
+            }
+        });
+        manager.registerReceiver(new SocketActionAdapter() {
+            @Override
+            public void onSocketDisconnection(ConnectionInfo info, String action, Exception e) {
+                super.onSocketDisconnection(info, action, e);
+                isClose=true;
+            }
+        });
+        manager.registerReceiver(new SocketActionAdapter() {
+            @Override
+            public void onSocketReadResponse(ConnectionInfo info, String action, OriginalData data) {
+                super.onSocketReadResponse(info, action, data);
+                int len=Integer.parseInt(new String(data.getHeadBytes()).trim());
+                String datastr=new String(data.getBodyBytes());
+
+                Log.i("socket***rlen",len+"");
+                Log.i("socket***rdata",new String(data.getBodyBytes()));
+
+                rf.offerLast(new VideoFrame(len,data.getBodyBytes()));
+            }
+        });
         onButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                openCamera();
-//                try {
-//                    //172.16.213.177
-//                    thread=new SendFrameThread("172.16.51.247",8004);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                thread.start();
-
-
+                //manager.connect();
+                requestSocket("pullup",manager);
             }
         });
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if(manager.isConnect()){
+                    manager.disconnect();
+                }
                 TimerTask task=new TimerTask() {
                     @Override
                     public void run() {
@@ -103,7 +220,6 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
                             @Override
                             public void run() {
                                 Log.i("timer rf.size()=",rf.size()+"");
-                                rf=thread.getReturnFrames();
                                 if(i_rf< rf.size()){
                                     Log.i("timer i=",i_rf+"");
                                     iv.setImageBitmap(BitmapFactory.decodeByteArray(rf.get(i_rf).getData(), 0, rf.get(i_rf).getData().length));
@@ -120,16 +236,10 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
                 }
                 camera.stopPreview();
                 releaseCamera(camera);
-                try {
-                    thread.exit();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         });
         return root;
     }
-    
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
@@ -145,55 +255,79 @@ public class HomeFragment extends Fragment implements SurfaceHolder.Callback {
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
         releaseCamera(camera);
     }
+
+
     /**
      * 打开相机
      */
     private void openCamera() {
-        try{
-            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
 
-        //获取相机参数
-        Camera.Parameters parameters = camera.getParameters();
-        //获取相机支持的预览的大小
-        //Camera.Size previewSize = getCameraPreviewSize(parameters);
-        int width = 640;// previewSizFe.width;
-        int height = 480;// previewSize.height;
-        //设置预览格式（也就是每一帧的视频格式）YUV420下的NV21
-        parameters.setPreviewFormat(ImageFormat.NV21);
-        List<int[]> fps=parameters.getSupportedPreviewFpsRange();
-        parameters.setPreviewFpsRange(fps.get(0)[0],fps.get(0)[1]);
-        //设置预览图像分辨率
-        parameters.setPreviewSize(width, height);
-        //相机旋转90度
-        camera.setDisplayOrientation(90);
-        //配置camera参数
-        camera.setParameters(parameters);
-        try {
-            camera.setPreviewDisplay(holder);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //设置监听获取视频流的每一帧
-        camera.setPreviewCallback(new Camera.PreviewCallback() {
-            @Override
-            public void onPreviewFrame(byte[] data, Camera camera) {
-                if (thread.isRemoteClosed()) return;
-                YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, width, height, null);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                yuvimage.compressToJpeg(new Rect(0, 0, width, height), 80, baos);
-                Bitmap bmp = BitmapFactory.decodeByteArray(baos.toByteArray(), 0, baos.toByteArray().length);
-                bmp.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-                thread.addFrame(new VideoFrame(baos.toByteArray().length,baos.toByteArray()));
-            }
-        });
-        //调用startPreview()用以更新preview的surface
-        camera.startPreview();
     }
 
+    public void sendByPost(int user_id,String phone, String user_nickname) {
+        User user=new User();
+        user.setId(3);
+        user.setNickname("大范甘迪个");
+        user.setPhone("4522425");
+        String path = "http://172.16.213.177:8080"+"/users/";
+        OkHttpClient client = new OkHttpClient();
+        MediaType JSONTYPE = MediaType.parse("application/json;charset=utf-8");
+        RequestBody requestBody=RequestBody.create(JSONTYPE, JSON.toJSONString(user));
+        Request request = new Request.Builder()
+                .url(path)
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                String info = response.body().string();
+                MyResponse<User> user1=JSON.parseObject(info, MyResponse.class);
+                Log.i("okhttp",JSON.toJSONString(user1));
+            }
+        });
+    }
 
+    /**
+     * 请求服务器socket就绪状态，就绪则进行姿态检测
+     * @param posture 待检测姿态
+     * @param manager OkSocket连接管理器
+     */
+    public void requestSocket(String posture,IConnectionManager manager) { //pullup
+        String path = "http://172.16.213.177:8080"+"/postures/"+posture;
+        OkHttpClient client = new OkHttpClient();
+        //MediaType JSONTYPE = MediaType.parse("application/json;charset=utf-8");
+        //RequestBody requestBody=RequestBody.create(JSONTYPE, JSON.toJSONString(user));
+        Request request = new Request.Builder()
+                .url(path)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                String info = response.body().string();
+                JSONObject json=JSON.parseObject(info);
+
+                if(json.get("msg").equals("socket is ready")){
+                    if(manager!=null && !manager.isConnect()){
+                        manager.connect();
+                    }
+                }else{
+                    Looper.prepare();
+                    Toast.makeText(getContext(),"socket isn't start",Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+                Log.i("socket***isReady",info);
+            }
+        });
+    }
 
     /**
      * 获取设备支持的最小分辨率
