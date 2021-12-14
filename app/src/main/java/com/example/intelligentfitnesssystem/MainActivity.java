@@ -18,7 +18,7 @@ import com.example.intelligentfitnesssystem.fragment.MineFragment;
 public class MainActivity extends AppCompatActivity {
 
     private FragmentTabHost tabHost;
-    private String[] tabs = new String[]{"首页", "社区", "我的"};
+    private String[] tabs = new String[]{"练习", "社区", "我的"};
     private Class[] mFragmentClasses = new Class[]{HomeFragment.class, CommunityFragment.class, MineFragment.class};
     private int[] selectorImg = new int[]{R.drawable.tab_ic_home_selector,R.drawable.tab_ic_community_selector,R.drawable.tab_ic_mine_selector};
 
