@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Intelligent Fitness System</string>
+    <string name="action_bar_color">#FFEB3B</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.intelligentfitnesssystem.activity;
 
+import android.app.StatusBarManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSON;
@@ -74,10 +76,16 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         surfaceView=findViewById(R.id.sfv);
         beginBtn=findViewById(R.id.begin);
         endBtn=findViewById(R.id.end);
+        ActionBar actionBar=getSupportActionBar();
+
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.hide();
         holder=surfaceView.getHolder();
         timer=new Timer();
         Intent intent=getIntent();
         type=intent.getStringExtra("type");
+        actionBar.setTitle(type);
         Toast.makeText(DetectActivity.this,type,Toast.LENGTH_SHORT).show();
         View.OnClickListener listener=new View.OnClickListener() {
             @Override
@@ -85,19 +93,17 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 switch(v.getId()) {
                     case R.id.begin:
                         surfaceView.setVisibility(View.VISIBLE);
-//                        initOksocket("172.16.51.247", 8004, null);
-////                        manager.connect()
-
-                        requestSocket("pullup");
+//                        initOksocket("192.168.43.200", 8004, null);
+//                        manager.connect();
+                        requestSocket(type);
 
                         break;
                     case R.id.end:
                         if(manager!=null&&manager.isConnect()){
                             manager.disconnect();
                         }
-                        iv.setImageBitmap(null);
+                        //iv.setImageBitmap(null);
                         surfaceView.setVisibility(View.GONE);
-
                         break;
                     default:
                         break;
@@ -107,6 +113,15 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         beginBtn.setOnClickListener(listener);
         endBtn.setOnClickListener(listener);
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        Intent intent=new Intent(DetectActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+        return super.onSupportNavigateUp();
+    }
+
     public void show(){
         TimerTask task=new TimerTask() {
             @Override
@@ -168,9 +183,11 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         //获取相机支持的预览的大小
                         DisplayMetrics dm=getResources().getDisplayMetrics();
 //                        Camera.Size previewSize=getCameraPreviewSize(parameters);
-                        Camera.Size previewSize = getBestCameraResolution(parameters,getScreenMetrics(DetectActivity.this));
-                        int width=previewSize.width;
-                        int height=previewSize.height;
+//                        Camera.Size previewSize = getBestCameraResolution(parameters,getScreenMetrics(DetectActivity.this));
+//                        int width=previewSize.width;
+//                        int height=previewSize.height;
+                        int width=640;
+                        int height=480;
 //                        int width =dm.widthPixels;// previewSizFe.width; //640
 //                        int height = dm.heightPixels;// previewSize.height;//480
                         //设置预览格式（也就是每一帧的视频格式）YUV420下的NV21
