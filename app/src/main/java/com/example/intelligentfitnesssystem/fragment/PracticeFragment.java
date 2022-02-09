@@ -2,16 +2,11 @@ package com.example.intelligentfitnesssystem.fragment;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,16 +19,10 @@ import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.activity.DetectActivity;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
 import com.example.intelligentfitnesssystem.bean.User;
-import com.example.intelligentfitnesssystem.bean.VideoFrame;
 import com.example.intelligentfitnesssystem.utils.Tools;
-import com.xuhao.didi.socket.client.sdk.client.connection.IConnectionManager;
 
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.LinkedList;
 
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -44,7 +33,7 @@ import okhttp3.Response;
 
 import static android.graphics.Typeface.BOLD;
 
-public class HomeFragment extends Fragment{
+public class PracticeFragment extends Fragment{
 
     public LinearLayout layout_type;
     public String type;
@@ -56,7 +45,7 @@ public class HomeFragment extends Fragment{
 
     @Override
     public View onCreateView(@NonNull  LayoutInflater inflater, @Nullable  ViewGroup container, @Nullable  Bundle savedInstanceState) {
-        View root=inflater.inflate(R.layout.layout_fragment_home,container,false);
+        View root=inflater.inflate(R.layout.layout_fragment_practice,container,false);
         layout_type=root.findViewById(R.id.layout_type);
 
         String[] types={"引体向上","仰卧起坐","俯卧撑"};

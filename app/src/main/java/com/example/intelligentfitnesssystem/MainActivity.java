@@ -3,28 +3,32 @@ package com.example.intelligentfitnesssystem;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTabHost;
-import com.example.intelligentfitnesssystem.R;
+
 import com.example.intelligentfitnesssystem.fragment.CommunityFragment;
-import com.example.intelligentfitnesssystem.fragment.HomeFragment;
+import com.example.intelligentfitnesssystem.fragment.PracticeFragment;
 import com.example.intelligentfitnesssystem.fragment.MineFragment;
+
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private FragmentTabHost tabHost;
     private String[] tabs = new String[]{"练习", "社区", "我的"};
-    private Class[] mFragmentClasses = new Class[]{HomeFragment.class, CommunityFragment.class, MineFragment.class};
+    private Class[] mFragmentClasses = new Class[]{PracticeFragment.class, CommunityFragment.class, MineFragment.class};
     private int[] selectorImg = new int[]{R.drawable.tab_ic_home_selector,R.drawable.tab_ic_community_selector,R.drawable.tab_ic_mine_selector};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Objects.requireNonNull(getSupportActionBar()).hide();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         setContentView(R.layout.layout_main);
         tabHost=findViewById(R.id.container);
         tabHost.setup(this,getSupportFragmentManager(),android.R.id.tabcontent);
