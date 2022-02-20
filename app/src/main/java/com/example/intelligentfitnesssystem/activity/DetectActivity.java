@@ -72,20 +72,15 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
     protected void onCreate(@Nullable  Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_detect);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         iv=findViewById(R.id.iv);
         surfaceView=findViewById(R.id.sfv);
         beginBtn=findViewById(R.id.begin);
         endBtn=findViewById(R.id.end);
-        ActionBar actionBar=getSupportActionBar();
-
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.hide();
         holder=surfaceView.getHolder();
         timer=new Timer();
         Intent intent=getIntent();
         type=intent.getStringExtra("type");
-        actionBar.setTitle(type);
         Toast.makeText(DetectActivity.this,type,Toast.LENGTH_SHORT).show();
         View.OnClickListener listener=new View.OnClickListener() {
             @Override
