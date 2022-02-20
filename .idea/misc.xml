@@ -3,10 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/red_pot.xml" value="0.38229166666666664" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/tab_ic_community_selector.xml" value="0.26145833333333335" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/tab_text_color_selector.xml" value="0.26145833333333335" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/item_tab.xml" value="0.2598958333333333" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_detect.xml" value="0.33" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_fragment_home.xml" value="0.33" />
-        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_fragment_mine.xml" value="0.33" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_fragment_mine.xml" value="0.67" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_fragment_practice.xml" value="0.30027173913043476" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_main.xml" value="0.2598958333333333" />
       </map>
