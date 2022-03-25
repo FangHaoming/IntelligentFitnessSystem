@@ -10,4 +10,7 @@
 
     <color name="colorPinkBlue">#7081E3</color>
     <color name="Gray">#bfbfbf</color>
+    <color name="btn_unable">#90B6B6B6</color>
+    <color name="btn_enable">#C400FF00</color>
+
 </resources>

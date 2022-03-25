@@ -1,18 +1,11 @@
-package com.example.intelligentfitnesssystem.utils;
-
-import android.util.Log;
+package com.example.intelligentfitnesssystem.util;
 
 import com.xuhao.didi.core.iocore.interfaces.ISendable;
 
-import org.json.JSONObject;
-
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 
 public class OkSocketSendData implements ISendable {
     private String str;

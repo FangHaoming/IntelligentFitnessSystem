@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTabHost;
 
+import com.example.intelligentfitnesssystem.databinding.LayoutMainBinding;
 import com.example.intelligentfitnesssystem.fragment.CommunityFragment;
 import com.example.intelligentfitnesssystem.fragment.PracticeFragment;
 import com.example.intelligentfitnesssystem.fragment.MineFragment;
@@ -20,23 +21,25 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private FragmentTabHost tabHost;
+    private LayoutMainBinding binding;
     private String[] tabs = new String[]{"练习", "社区", "我的"};
     private Class[] mFragmentClasses = new Class[]{PracticeFragment.class, CommunityFragment.class, MineFragment.class};
-    private int[] selectorImg = new int[]{R.drawable.tab_ic_home_selector,R.drawable.tab_ic_community_selector,R.drawable.tab_ic_mine_selector};
+    private int[] selectorImg = new int[]{R.drawable.tab_ic_home_selector, R.drawable.tab_ic_community_selector, R.drawable.tab_ic_mine_selector};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = LayoutMainBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);  隐藏状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        setContentView(R.layout.layout_main);
-        tabHost=findViewById(R.id.container);
-        tabHost.setup(this,getSupportFragmentManager(),android.R.id.tabcontent);
-        for (int i = 0; i < 3; i++) {
-            tabHost.addTab(tabHost.newTabSpec(tabs[i]).setIndicator(getTabView(i)), mFragmentClasses[i], null);
+        setContentView(view);
+        binding.container.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
+        for (int i = 0; i < tabs.length; i++) {
+            binding.container.addTab(binding.container.newTabSpec(tabs[i]).setIndicator(getTabView(i)), mFragmentClasses[i], null);
         }
         // 设置默认tab
-        tabHost.setCurrentTab(0);
+        binding.container.setCurrentTab(0);
     }
 
     private View getTabView(int index) {

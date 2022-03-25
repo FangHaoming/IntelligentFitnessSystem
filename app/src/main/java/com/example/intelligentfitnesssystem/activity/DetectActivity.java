@@ -1,6 +1,5 @@
 package com.example.intelligentfitnesssystem.activity;
 
-import android.app.StatusBarManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,7 +8,6 @@ import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -24,7 +22,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSON;
@@ -32,7 +29,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.intelligentfitnesssystem.MainActivity;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.VideoFrame;
-import com.example.intelligentfitnesssystem.utils.OkSocketSendData;
+import com.example.intelligentfitnesssystem.util.OkSocketSendData;
 import com.xuhao.didi.core.pojo.OriginalData;
 import com.xuhao.didi.core.protocol.IReaderProtocol;
 import com.xuhao.didi.socket.client.sdk.OkSocket;

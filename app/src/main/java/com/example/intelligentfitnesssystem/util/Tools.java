@@ -1,4 +1,4 @@
-package com.example.intelligentfitnesssystem.utils;
+package com.example.intelligentfitnesssystem.util;
 
 import android.content.Context;
 
