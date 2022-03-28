@@ -26,9 +26,12 @@ import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.databinding.ActivityLoginBinding;
 import com.example.intelligentfitnesssystem.util.AppManager;
 import com.example.intelligentfitnesssystem.util.EditIsCanUseBtnUtils;
+import com.example.intelligentfitnesssystem.util.FileUtils;
+import com.example.intelligentfitnesssystem.util.Http;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -114,11 +117,60 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void handleLogin(String phone, String pwd) throws IOException {
+        String response = Http.commitLogin(this,phone,pwd);
+        JSONObject result = JSON.parseObject(response);
+        System.out.println("**********commitLogin_response" + response);
+        JSONObject data = (JSONObject) result.get("data");
+        switch (result.getInteger("status")) {
+            case 0:
+                assert data != null;
+                SharedPreferences local_sp = getSharedPreferences("data_" + data.getInteger("id"), MODE_PRIVATE); //根据ID获取用户数据文件
+                local_editor = local_sp.edit();
+                local_editor.putString("token", result.getString("token"));
+                if (binding.checkPwd.isChecked()) {
+                    global_editor.putBoolean("isRemember", true);
+                } else {
+                    global_editor.putBoolean("isRemember", false);
+                }
+                if (binding.checkAuto.isChecked()) {
+                    global_editor.putBoolean("isAuto", true);
+                } else {
+                    global_editor.putBoolean("isAuto", false);
+                }
+                localUser = (User) JSONObject.parseObject(data.toJSONString(), User.class);
+
+                local_editor.putString("user_nickname",data.getString("nickname"));
+                local_editor.putString("user_pwdHex",data.getString("pwdHex"));
+
+                global_editor.putBoolean("isLogin", true);
+                local_editor.apply();
+                global_editor.apply();
+
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                Looper.prepare();
+                Toast.makeText(LoginActivity.this, "登录成功!", Toast.LENGTH_SHORT).show();
+                Looper.loop();
+                break;
+            case 1:
+                Looper.prepare();
+                Toast.makeText(LoginActivity.this, "密码错误!", Toast.LENGTH_SHORT).show();
+                Looper.loop();
+                break;
+            case 2:
+                Looper.prepare();
+                Toast.makeText(LoginActivity.this, "该账户不存在!", Toast.LENGTH_SHORT).show();
+                Looper.loop();
+                break;
+        }
+    }
     private void commitLogin(String phone, String pwd) {
         User user = new User();
         user.setPhone(phone);
-        user.setPwdHex(pwd);
-        String path = getResources().getString(R.string.baseUrl) + "/userLogin";
+        user.setPwdHex(FileUtils.sha1String(pwd));
+        String path = getResources().getString(R.string.baseUrl) + getResources().getString(R.string.api_login);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
         Request request = new Request.Builder()
@@ -139,14 +191,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 String info = response.body().string();
                 JSONObject result = JSON.parseObject(info);
-                System.out.println("**********commitLogin info" + info);
-                JSONObject data = JSON.parseObject((String) result.get("data"));
+                System.out.println("**********commitLogin_response" + info);
+                JSONObject data = (JSONObject) result.get("data");
                 switch (Integer.parseInt(result.get("status").toString())) {
                     case 0:
 //                        http.sendByPost(LoginActivity.this, json.getInteger("user_id"));
 //                        发请求 获取社区、个人页面数据
                         SharedPreferences local_sp = getSharedPreferences("data_" + data.getInteger("id"), MODE_PRIVATE); //根据ID获取用户数据文件
                         local_editor = local_sp.edit();
+                        local_editor.putString("token", result.getString("token"));
                         if (binding.checkPwd.isChecked()) {
                             global_editor.putBoolean("isRemember", true);
                         } else {
@@ -158,23 +211,10 @@ public class LoginActivity extends AppCompatActivity {
                             global_editor.putBoolean("isAuto", false);
                         }
                         localUser = (User) JSONObject.parseObject(data.toJSONString(), User.class);
-                        for (Field f : localUser.getClass().getDeclaredFields()) {
-                            f.setAccessible(true);
-                            try {
-                                Class<?> type = f.getType();
-                                if (Integer.class.equals(type)) {
-                                    local_editor.putInt("user_" + f.getName(), (Integer) f.get(f.getName()));
-                                    global_editor.putInt("user_" + f.getName(), (Integer) f.get(f.getName()));
-                                }
-                                if (String.class.equals(type)) {
-                                    local_editor.putString("user_" + f.getName(), (String) f.get(f.getName()));
-                                    global_editor.putString("user_" + f.getName(), (String) f.get(f.getName()));
-                                }
-                            } catch (IllegalAccessException e) {
-                                e.printStackTrace();
-                            }
 
-                        }
+                        local_editor.putString("user_nickname",data.getString("nickname"));
+                        local_editor.putString("user_pwdHex",data.getString("pwdHex"));
+
                         global_editor.putBoolean("isLogin", true);
                         local_editor.apply();
                         global_editor.apply();

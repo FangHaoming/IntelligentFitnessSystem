@@ -1,8 +1,8 @@
 package com.example.intelligentfitnesssystem.bean;
 
-import com.alibaba.fastjson.serializer.SerializeFilter;
+import java.io.Serializable;
 
-public class User implements SerializeFilter {
+public class User implements Serializable {
     private int id;
     private String phone;
     private String nickname;
@@ -11,15 +11,6 @@ public class User implements SerializeFilter {
     private String img;
     private String imgHex;
     private String pwdHex;
-    private byte[] imgData;
-
-    public byte[] getImgData() {
-        return imgData;
-    }
-
-    public void setImgData(byte[] imgData) {
-        this.imgData = imgData;
-    }
 
     public String getGender() {
         return gender;

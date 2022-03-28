@@ -16,6 +16,8 @@ import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
 import com.example.intelligentfitnesssystem.databinding.LayoutFragmentMineBinding;
 
+import java.util.Objects;
+
 public class MineFragment extends Fragment {
 
     private LayoutFragmentMineBinding binding;
@@ -29,8 +31,8 @@ public class MineFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = LayoutFragmentMineBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-        global_sp = getContext().getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        local_sp = getContext().getSharedPreferences("data_" + global_sp.getInt("user_id", 0), Context.MODE_PRIVATE);
+        global_sp = requireContext().getSharedPreferences("data_global", Context.MODE_PRIVATE);
+        local_sp = requireContext().getSharedPreferences("data_" + global_sp.getInt("user_id", 0), Context.MODE_PRIVATE);
         local_editor = local_sp.edit();
         global_editor = global_sp.edit();
         binding.fragmentMine.setOnClickListener(new View.OnClickListener() {

@@ -20,6 +20,7 @@ import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.databinding.ActivityRegisterBinding;
 import com.example.intelligentfitnesssystem.util.EditIsCanUseBtnUtils;
+import com.example.intelligentfitnesssystem.util.FileUtils;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -84,11 +85,13 @@ public class RegisterActivity extends AppCompatActivity {
     private void commitRegister(String nickname, String phone, String pwd) {
         User user = new User();
         user.setPhone(phone);
-        user.setPwdHex(pwd);
+        user.setPwdHex(FileUtils.sha1String(pwd));
         user.setNickname(nickname);
-        String path = getResources().getString(R.string.baseUrl) + getResources().getString(R.string.registerApi);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("user", user);
+        String path = getResources().getString(R.string.baseUrl) + getResources().getString(R.string.api_register);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
-        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
+        RequestBody requestBody = RequestBody.Companion.create(jsonObject.toJSONString(), TYPE);
         Request request = new Request.Builder()
                 .url(path)
                 .post(requestBody)
@@ -107,7 +110,7 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 String info = response.body().string();
                 JSONObject json = JSON.parseObject(info);
-                System.out.println("**********info" + info);
+                System.out.println("**********commitRegister_response: " + info);
                 switch (Objects.requireNonNull(json.get("msg")).toString()) {
                     case "success":
                         Looper.prepare();

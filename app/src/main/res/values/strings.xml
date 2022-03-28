@@ -12,10 +12,13 @@
     <string name="login_failed">"Login failed"</string>
 
     <string name="registerLink"><u>新用户注册</u></string>
-    <string name="baseUrl">http://10.22.32.85:8080</string>
+    <string name="baseUrl">http://192.168.1.106:8080</string>
     <string name="baseUrl_local">http://172.16.73.48:8080</string>
     <string name="baseUrl_remote">http://10.22.32.85:8080</string>
-    <string name="loginApi">/users/login</string>
-    <string name="registerApi">/users</string>
+    <string name="api_login">/users/login</string>
+    <string name="api_register">/users</string>
+    <string name="api_release_article">/articles</string>
+    <string name="api_release_comment">/articles/comments</string>
+    <string name="api_get_img">/images</string>
 
 </resources>
