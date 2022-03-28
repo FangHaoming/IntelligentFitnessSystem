@@ -12,7 +12,7 @@
     <string name="login_failed">"Login failed"</string>
 
     <string name="registerLink"><u>新用户注册</u></string>
-    <string name="baseUrl">http://192.168.1.106:8080</string>
+    <string name="baseUrl">https://407302b9g6.eicp.vip:8080</string>
     <string name="baseUrl_local">http://172.16.73.48:8080</string>
     <string name="baseUrl_remote">http://10.22.32.85:8080</string>
     <string name="api_login">/users/login</string>
@@ -20,5 +20,12 @@
     <string name="api_release_article">/articles</string>
     <string name="api_release_comment">/articles/comments</string>
     <string name="api_get_img">/images</string>
+    <string name="status_server_error">{"status":-1}</string>
+    <string name="focus">关注</string>
+    <string name="focused">已关注</string>
+    <string name="chosen">精选</string>
+    <string name="latest">最新</string>
+    <string name="text_normal">16sp</string>
+    <string name="text_selected">20sp</string>
 
 </resources>

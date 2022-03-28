@@ -21,6 +21,7 @@ import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.databinding.ActivityRegisterBinding;
 import com.example.intelligentfitnesssystem.util.EditIsCanUseBtnUtils;
 import com.example.intelligentfitnesssystem.util.FileUtils;
+import com.example.intelligentfitnesssystem.util.Http;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -76,63 +77,40 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (isUserNameAndPwdValid()) {
                     System.out.println("****************pwd" + user_pwd);
-                    commitRegister(user_name, user_phone, user_pwd);
+                    try {
+                        commitRegister(user_name, user_phone, user_pwd);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
     }
 
-    private void commitRegister(String nickname, String phone, String pwd) {
-        User user = new User();
-        user.setPhone(phone);
-        user.setPwdHex(FileUtils.sha1String(pwd));
-        user.setNickname(nickname);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("user", user);
-        String path = getResources().getString(R.string.baseUrl) + getResources().getString(R.string.api_register);
-        MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
-        RequestBody requestBody = RequestBody.Companion.create(jsonObject.toJSONString(), TYPE);
-        Request request = new Request.Builder()
-                .url(path)
-                .post(requestBody)
-                .build();
-        OkHttpClient client = new OkHttpClient();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
+    private void commitRegister(String nickname, String phone, String pwd) throws IOException {
+        String response = Http.commitRegister(this,nickname,phone,pwd);
+        JSONObject json = JSON.parseObject(response);
+        System.out.println("**********commitRegister_response: " + response);
+        switch (Objects.requireNonNull(json.get("msg")).toString()) {
+            case "success":
                 Looper.prepare();
-                Toast.makeText(RegisterActivity.this, "服务器连接失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, "注册成功!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
                 Looper.loop();
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                String info = response.body().string();
-                JSONObject json = JSON.parseObject(info);
-                System.out.println("**********commitRegister_response: " + info);
-                switch (Objects.requireNonNull(json.get("msg")).toString()) {
-                    case "success":
-                        Looper.prepare();
-                        Toast.makeText(RegisterActivity.this, "注册成功!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                        finish();
-                        Looper.loop();
-                        break;
-                    case "server error":
-                        Looper.prepare();
-                        Toast.makeText(RegisterActivity.this, "注册失败!", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                        break;
-                    case "already exist":
-                        Looper.prepare();
-                        Toast.makeText(RegisterActivity.this, "该账号已存在!", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                        break;
-                }
-            }
-        });
+                break;
+            case "server error":
+                Looper.prepare();
+                Toast.makeText(RegisterActivity.this, "注册失败!", Toast.LENGTH_SHORT).show();
+                Looper.loop();
+                break;
+            case "already exist":
+                Looper.prepare();
+                Toast.makeText(RegisterActivity.this, "该账号已存在!", Toast.LENGTH_SHORT).show();
+                Looper.loop();
+                break;
+        }
     }
 
     public boolean isUserNameAndPwdValid() {

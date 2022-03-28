@@ -83,7 +83,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
             @Override
             public void onClick(View v) {
                 switch(v.getId()) {
-                    case R.id.begin:
+                    case R.id.begin:    
                         surfaceView.setVisibility(View.VISIBLE);
 //                        initOksocket("192.168.43.200", 8004, null);
 //                        manager.connect();

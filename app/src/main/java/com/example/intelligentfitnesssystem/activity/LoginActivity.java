@@ -1,6 +1,7 @@
 package com.example.intelligentfitnesssystem.activity;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
@@ -47,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private SharedPreferences.Editor local_editor;
     private SharedPreferences.Editor global_editor;
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -110,7 +112,11 @@ public class LoginActivity extends AppCompatActivity {
                 } else if (binding.pwd.getText().toString().trim().equals("")) {
                     Toast.makeText(LoginActivity.this, "请输入密码", Toast.LENGTH_SHORT).show();
                 } else {
-                    commitLogin(binding.phone.getText().toString().trim(), binding.pwd.getText().toString().trim());
+                    try {
+                        handleLogin(binding.phone.getText().toString().trim(), binding.pwd.getText().toString().trim());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
             }
@@ -164,81 +170,12 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "该账户不存在!", Toast.LENGTH_SHORT).show();
                 Looper.loop();
                 break;
-        }
-    }
-    private void commitLogin(String phone, String pwd) {
-        User user = new User();
-        user.setPhone(phone);
-        user.setPwdHex(FileUtils.sha1String(pwd));
-        String path = getResources().getString(R.string.baseUrl) + getResources().getString(R.string.api_login);
-        MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
-        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
-        Request request = new Request.Builder()
-                .url(path)
-                .post(requestBody)
-                .build();
-        OkHttpClient client = new OkHttpClient();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
+            case -1:
                 Looper.prepare();
-                Toast.makeText(LoginActivity.this, "服务器连接失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "服务器连接失败!", Toast.LENGTH_SHORT).show();
                 Looper.loop();
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                String info = response.body().string();
-                JSONObject result = JSON.parseObject(info);
-                System.out.println("**********commitLogin_response" + info);
-                JSONObject data = (JSONObject) result.get("data");
-                switch (Integer.parseInt(result.get("status").toString())) {
-                    case 0:
-//                        http.sendByPost(LoginActivity.this, json.getInteger("user_id"));
-//                        发请求 获取社区、个人页面数据
-                        SharedPreferences local_sp = getSharedPreferences("data_" + data.getInteger("id"), MODE_PRIVATE); //根据ID获取用户数据文件
-                        local_editor = local_sp.edit();
-                        local_editor.putString("token", result.getString("token"));
-                        if (binding.checkPwd.isChecked()) {
-                            global_editor.putBoolean("isRemember", true);
-                        } else {
-                            global_editor.putBoolean("isRemember", false);
-                        }
-                        if (binding.checkAuto.isChecked()) {
-                            global_editor.putBoolean("isAuto", true);
-                        } else {
-                            global_editor.putBoolean("isAuto", false);
-                        }
-                        localUser = (User) JSONObject.parseObject(data.toJSONString(), User.class);
-
-                        local_editor.putString("user_nickname",data.getString("nickname"));
-                        local_editor.putString("user_pwdHex",data.getString("pwdHex"));
-
-                        global_editor.putBoolean("isLogin", true);
-                        local_editor.apply();
-                        global_editor.apply();
-
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                        Looper.prepare();
-                        Toast.makeText(LoginActivity.this, "登录成功!", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                        break;
-                    case 1:
-                        Looper.prepare();
-                        Toast.makeText(LoginActivity.this, "密码错误!", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                        break;
-                    case 2:
-                        Looper.prepare();
-                        Toast.makeText(LoginActivity.this, "该账户不存在!", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                        break;
-                }
-            }
-        });
+                break;
+        }
     }
 
     @Override

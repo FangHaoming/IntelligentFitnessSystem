@@ -25,6 +25,28 @@ import okhttp3.Response;
 
 public class Http {
 
+    public static String commitRegister(Context context, String nickname, String phone, String pwd) throws IOException {
+        User user = new User();
+        user.setPhone(phone);
+        user.setPwdHex(FileUtils.sha1String(pwd));
+        user.setNickname(nickname);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("user", user);
+        String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
+        MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
+        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
+        Request request = new Request.Builder()
+                .url(path)
+                .post(requestBody)
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        Response response = call.execute();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
+    }
 
     public static String commitLogin(Context context, String phone, String pwd) throws IOException {
         User user = new User();
@@ -40,7 +62,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String commitArticle(Context context, Article article) throws IOException {
@@ -58,7 +83,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String commitComment(Context context, Comment comment) throws IOException {
@@ -75,7 +103,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String modifyUser(Context context, User user) throws IOException {
@@ -93,7 +124,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String followUser(Context context, int userId) throws IOException {
@@ -111,7 +145,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String getArticleList(Context context, String type, int pageNum, int pageSize) throws IOException {
@@ -127,7 +164,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String getArticleInfo(Context context, int articleId) throws IOException {
@@ -143,7 +183,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String getUserInfo(Context context, String phone) throws IOException {
@@ -159,7 +202,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String praiseArticle(Context context, int articleId) throws IOException {
@@ -177,7 +223,10 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 
     public static String praiseComment(Context context, int commentId) throws IOException {
@@ -195,6 +244,9 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        return Objects.requireNonNull(response.body()).string();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
     }
 }
