@@ -3,7 +3,6 @@ package com.example.intelligentfitnesssystem;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,7 +14,8 @@ import com.example.intelligentfitnesssystem.fragment.CommunityFragment;
 import com.example.intelligentfitnesssystem.fragment.PracticeFragment;
 import com.example.intelligentfitnesssystem.fragment.MineFragment;
 
-import java.util.Objects;
+import static com.example.intelligentfitnesssystem.MyApplication.setTabHost;
+import static com.example.intelligentfitnesssystem.MyApplication.initApp;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -30,16 +30,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = LayoutMainBinding.inflate(getLayoutInflater());
+        initApp(MainActivity.this);
         View view = binding.getRoot();
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);  隐藏状态栏
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setContentView(view);
-        binding.container.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
+        binding.container.setup(MainActivity.this, getSupportFragmentManager(), android.R.id.tabcontent);
         for (int i = 0; i < tabs.length; i++) {
             binding.container.addTab(binding.container.newTabSpec(tabs[i]).setIndicator(getTabView(i)), mFragmentClasses[i], null);
         }
         // 设置默认tab
         binding.container.setCurrentTab(0);
+        setTabHost(binding.container,getApplicationContext(),getSupportFragmentManager());
     }
 
     private View getTabView(int index) {
@@ -50,4 +52,5 @@ public class MainActivity extends AppCompatActivity {
         tabTitle.setText(tabs[index]);// 通过selector来控制文字颜色的改变
         return inflate;
     }
+
 }

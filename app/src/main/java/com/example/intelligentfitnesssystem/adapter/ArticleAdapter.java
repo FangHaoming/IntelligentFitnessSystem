@@ -138,7 +138,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             img_0 = itemView.findViewById(R.id.image_0);
             img_1 = itemView.findViewById(R.id.image_1);
             img_2 = itemView.findViewById(R.id.image_2);
-            video = itemView.findViewById(R.id.video);
+            video = itemView.findViewById(R.id.content_video);
             praise = itemView.findViewById(R.id.praise);
             praise_num = itemView.findViewById(R.id.praise_num);
             comment = itemView.findViewById(R.id.comment);

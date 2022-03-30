@@ -10,44 +10,58 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
+import com.example.intelligentfitnesssystem.activity.ModifyInfoActivity;
 import com.example.intelligentfitnesssystem.databinding.LayoutFragmentMineBinding;
 
 import java.util.Objects;
 
+import static com.example.intelligentfitnesssystem.MyApplication.global_sp;
+import static com.example.intelligentfitnesssystem.MyApplication.isLogin;
+import static com.example.intelligentfitnesssystem.MyApplication.localUser;
+import static com.example.intelligentfitnesssystem.MyApplication.local_sp;
+
 public class MineFragment extends Fragment {
 
     private LayoutFragmentMineBinding binding;
-    private SharedPreferences local_sp;
-    private SharedPreferences.Editor local_editor;
-    private SharedPreferences global_sp;
-    private SharedPreferences.Editor global_editor;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = LayoutFragmentMineBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-        global_sp = requireContext().getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        local_sp = requireContext().getSharedPreferences("data_" + global_sp.getInt("user_id", 0), Context.MODE_PRIVATE);
-        local_editor = local_sp.edit();
-        global_editor = global_sp.edit();
+
+        checkIsLogin();
         binding.fragmentMine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkIsLogin();
             }
         });
-        checkIsLogin();
+        binding.modify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkIsLogin();
+                if (isLogin) {
+                    Intent intent = new Intent(getContext(), ModifyInfoActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        initView();
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        initView();
     }
 
     @Override
@@ -57,9 +71,24 @@ public class MineFragment extends Fragment {
     }
 
     private void checkIsLogin() {
-        if (!global_sp.getBoolean("isLogin", false)) {
+        if (!isLogin) {
             Intent toLogin = new Intent(getContext(), LoginActivity.class);
             startActivity(toLogin);
         }
     }
+
+    private void initView(){
+        if (isLogin) {
+            if (localUser.getImg() != null && !localUser.getImg().equals("")) {
+                Glide.with(requireContext()).load(requireContext().getResources().getString(R.string.baseUrl) + requireContext().getResources().getString(R.string.api_get_img)+localUser.getImg()).into(binding.userImg);
+            }
+            binding.userName.setText(localUser.getNickname());
+            //TODO 设置用户信息
+        }else{
+            binding.userImg.setImageResource(R.drawable.user_img);
+            binding.userName.setText(R.string.click_to_login);
+        }
+    }
+
+
 }

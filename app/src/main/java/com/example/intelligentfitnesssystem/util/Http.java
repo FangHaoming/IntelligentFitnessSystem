@@ -23,6 +23,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.intelligentfitnesssystem.MyApplication.local_sp;
+
 public class Http {
 
     public static String commitRegister(Context context, String nickname, String phone, String pwd) throws IOException {
@@ -34,7 +36,8 @@ public class Http {
         jsonObject.put("user", user);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
-        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
+        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(jsonObject), TYPE);
+        System.out.println("****register request "+JSON.toJSONString(user));
         Request request = new Request.Builder()
                 .url(path)
                 .post(requestBody)
@@ -69,8 +72,6 @@ public class Http {
     }
 
     public static String commitArticle(Context context, Article article) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
 
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");

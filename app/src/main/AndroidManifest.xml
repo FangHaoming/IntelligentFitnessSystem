@@ -24,7 +24,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.IntelligentFitnessSystem"
-        android:usesCleartextTraffic="true" >
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+        >
 
         <activity
             android:name=".MainActivity"
@@ -51,6 +53,11 @@
             android:name=".activity.RegisterActivity"
             android:parentActivityName=".activity.LoginActivity"
             android:launchMode="singleTask">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity android:name=".activity.ModifyInfoActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

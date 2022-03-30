@@ -77,40 +77,47 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (isUserNameAndPwdValid()) {
                     System.out.println("****************pwd" + user_pwd);
-                    try {
-                        commitRegister(user_name, user_phone, user_pwd);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    commitRegister(user_name, user_phone, user_pwd);
                 }
             }
         });
     }
 
-    private void commitRegister(String nickname, String phone, String pwd) throws IOException {
-        String response = Http.commitRegister(this,nickname,phone,pwd);
-        JSONObject json = JSON.parseObject(response);
-        System.out.println("**********commitRegister_response: " + response);
-        switch (Objects.requireNonNull(json.get("msg")).toString()) {
-            case "success":
-                Looper.prepare();
-                Toast.makeText(RegisterActivity.this, "注册成功!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-                Looper.loop();
-                break;
-            case "server error":
-                Looper.prepare();
-                Toast.makeText(RegisterActivity.this, "注册失败!", Toast.LENGTH_SHORT).show();
-                Looper.loop();
-                break;
-            case "already exist":
-                Looper.prepare();
-                Toast.makeText(RegisterActivity.this, "该账号已存在!", Toast.LENGTH_SHORT).show();
-                Looper.loop();
-                break;
-        }
+    private void commitRegister(String nickname, String phone, String pwd) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String response = null;
+                try {
+                    response = Http.commitRegister(getApplicationContext(), nickname, phone, pwd);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                while (response == null) { }
+                JSONObject json = JSON.parseObject(response);
+                System.out.println("**********commitRegister_response: " + response);
+                switch (Objects.requireNonNull(json.get("msg")).toString()) {
+                    case "success":
+                        Looper.prepare();
+                        Toast.makeText(RegisterActivity.this, "注册成功!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                        Looper.loop();
+                        break;
+                    case "server error":
+                        Looper.prepare();
+                        Toast.makeText(RegisterActivity.this, "注册失败!", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                        break;
+                    case "already exist":
+                        Looper.prepare();
+                        Toast.makeText(RegisterActivity.this, "该账号已存在!", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                        break;
+                }
+            }
+        }).start();
     }
 
     public boolean isUserNameAndPwdValid() {
