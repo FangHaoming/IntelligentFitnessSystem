@@ -13,13 +13,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
 import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.R;
+import com.example.intelligentfitnesssystem.bean.MyResponse;
 import com.example.intelligentfitnesssystem.util.Http;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import cn.ittiger.player.VideoPlayerView;
@@ -35,6 +39,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.list = list;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void setList(List<Article> list) {
+        this.list = list;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,21 +54,31 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
-            Glide.with(mContext).load(list.get(position).getImg()[0]).into(((ListViewHolder) holder).head); //TODO 改为头像路径
-            ((ListViewHolder) holder).nickname.setText(list.get(position).getUserId());//TODO 改为昵称
+//            Glide.with(mContext).load(list.get(position).getImg()[0]).into(((ListViewHolder) holder).head); //TODO 改为头像路径
+            ((ListViewHolder) holder).nickname.setText(String.valueOf(list.get(position).getUserId()));//TODO 改为昵称
+            ((ListViewHolder) holder).createTime.setText(list.get(position).getCreateTime());//TODO 改为昵称
             ((ListViewHolder) holder).focus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    try {
-                        Http.followUser(mContext, list.get(position).getUserId());
-                        if (((ListViewHolder) holder).focus.getText().equals(mContext.getResources().getString(R.string.focus))) {
-                            ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
-                        } else {
-                            ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                System.out.println("*****item_id " + list.get(position).getUserId());
+                                MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
+                                if (result.getStatus() == 0) {
+                                    if (((ListViewHolder) holder).focus.getText().equals(mContext.getResources().getString(R.string.focus))) {
+                                        ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
+                                    } else {
+                                        ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
+                                    }
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    }).start();
+
                 }
             });
             ((ListViewHolder) holder).content_text.setText(list.get(position).getText());
@@ -90,7 +109,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
                 }
             });
-            ((ListViewHolder) holder).praise_num.setText(list.get(position).getLikeCount());
+            ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
             ((ListViewHolder) holder).comment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -98,7 +117,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     mContext.startActivity(intent);
                 }
             });
-            ((ListViewHolder) holder).comment_num.setText(list.get(position).getCommentCount());
+            ((ListViewHolder) holder).comment_num.setText(String.valueOf(list.get(position).getCommentCount()));
             ((ListViewHolder) holder).transport.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -117,6 +136,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public static class ListViewHolder extends RecyclerView.ViewHolder {
         CircleImageView head;
         TextView nickname;
+        TextView createTime;
         Button focus;
         TextView content_text;
         ImageView img_0;
@@ -133,6 +153,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             super(itemView);
             head = itemView.findViewById(R.id.head);
             nickname = itemView.findViewById(R.id.nickname);
+            createTime = itemView.findViewById(R.id.createTime);
             focus = itemView.findViewById(R.id.focus);
             content_text = itemView.findViewById(R.id.content_text);
             img_0 = itemView.findViewById(R.id.image_0);

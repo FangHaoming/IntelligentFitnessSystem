@@ -23,6 +23,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.example.intelligentfitnesssystem.MyApplication.global_sp;
+import static com.example.intelligentfitnesssystem.MyApplication.localUser;
 import static com.example.intelligentfitnesssystem.MyApplication.local_sp;
 
 public class Http {
@@ -54,7 +56,8 @@ public class Http {
     public static String commitLogin(Context context, String phone, String pwd) throws IOException {
         User user = new User();
         user.setPhone(phone);
-        user.setPwdHex(FileUtils.sha1String(pwd));
+//        user.setPwdHex(FileUtils.sha1String(pwd));
+        user.setPwdHex(pwd);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_login);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
@@ -132,15 +135,13 @@ public class Http {
     }
 
     public static String followUser(Context context, int userId) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
-        String url = path + "/" + userId + "/followers/" + local_sp.getInt("user_id", 0);
+        String url = path + "/" + userId + "/followers/" + localUser.getId();
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create("", TYPE);
         Request request = new Request.Builder()
                 .url(url)
-                .put(requestBody)
+                .post(requestBody)
                 .addHeader("token", local_sp.getString("token", ""))
                 .build();
         OkHttpClient client = new OkHttpClient();
@@ -153,10 +154,8 @@ public class Http {
     }
 
     public static String getArticleList(Context context, String type, int pageNum, int pageSize) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
-        String url = path + "/" + local_sp.getInt("user_id", 0) + "/" + type + "?page=" + pageNum + "&perPage=" + pageSize;
+        String url = path + "/" + localUser.getId() + "/" + type + "?page=" + pageNum + "&perPage=" + pageSize;
         Request request = new Request.Builder()
                 .url(url)
                 .get()
@@ -172,8 +171,6 @@ public class Http {
     }
 
     public static String getArticleInfo(Context context, int articleId) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
         String url = path + "/" + articleId;
         Request request = new Request.Builder()

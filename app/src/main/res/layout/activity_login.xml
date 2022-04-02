@@ -49,8 +49,9 @@
                 android:id="@+id/phone"
                 android:layout_width="250dp"
                 android:layout_height="50dp"
+                android:text="13531795736"
                 android:hint="请填写手机号"
-                android:inputType="textPersonName"
+                android:inputType="phone"
                 android:maxLength="11"
                 android:padding="10dp" />
         </LinearLayout>
@@ -77,6 +78,7 @@
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:ems="10"
+                android:text="7c4a8d09ca3762af61e59520943dc26494f8941b"
                 android:hint="填写密码"
                 android:inputType="textPassword"
                 android:padding="10dp" />

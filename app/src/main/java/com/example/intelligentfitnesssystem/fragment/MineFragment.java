@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
@@ -29,6 +32,7 @@ import static com.example.intelligentfitnesssystem.MyApplication.local_sp;
 public class MineFragment extends Fragment {
 
     private LayoutFragmentMineBinding binding;
+    private TextView current;
 
     @Nullable
     @Override
@@ -36,6 +40,7 @@ public class MineFragment extends Fragment {
         binding = LayoutFragmentMineBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
+        current = binding.articleBtn;
         checkIsLogin();
         binding.fragmentMine.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +60,25 @@ public class MineFragment extends Fragment {
         });
 
         initView();
+
+        binding.articleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchTab(binding.articleBtn);
+            }
+        });
+        binding.focusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchTab(binding.focusBtn);
+            }
+        });
+        binding.followerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchTab(binding.followerBtn);
+            }
+        });
         return view;
     }
 
@@ -70,6 +94,15 @@ public class MineFragment extends Fragment {
         binding = null;
     }
 
+
+    private void switchTab(TextView tv) {
+        current.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        current.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_normal));
+        current = tv;
+        current.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        current.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_selected));
+    }
+
     private void checkIsLogin() {
         if (!isLogin) {
             Intent toLogin = new Intent(getContext(), LoginActivity.class);
@@ -77,16 +110,20 @@ public class MineFragment extends Fragment {
         }
     }
 
-    private void initView(){
+    private void initView() {
         if (isLogin) {
             if (localUser.getImg() != null && !localUser.getImg().equals("")) {
-                Glide.with(requireContext()).load(requireContext().getResources().getString(R.string.baseUrl) + requireContext().getResources().getString(R.string.api_get_img)+localUser.getImg()).into(binding.userImg);
+                Glide.with(requireContext()).load(requireContext().getResources().getString(R.string.baseUrl) + requireContext().getResources().getString(R.string.api_get_img) + localUser.getImg()).into(binding.userImg);
             }
             binding.userName.setText(localUser.getNickname());
+            binding.focusNum.setText(String.valueOf(localUser.getFocus().length));
+            binding.followerNum.setText(String.valueOf(localUser.getFollowers().length));
             //TODO 设置用户信息
-        }else{
+        } else {
             binding.userImg.setImageResource(R.drawable.user_img);
             binding.userName.setText(R.string.click_to_login);
+            binding.focusNum.setText("-");
+            binding.followerNum.setText("-");
         }
     }
 

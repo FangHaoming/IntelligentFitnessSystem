@@ -23,6 +23,7 @@ import com.example.intelligentfitnesssystem.util.Tools;
 
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -95,7 +96,7 @@ public class PracticeFragment extends Fragment {
         String path = "http://172.16.213.177:8080" + "/users/";
         OkHttpClient client = new OkHttpClient();
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
-        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user),TYPE);
+        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
         Request request = new Request.Builder()
                 .url(path)
                 .post(requestBody)
@@ -109,7 +110,7 @@ public class PracticeFragment extends Fragment {
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 String info = response.body().string();
-                MyResponse<User> user1 = JSON.parseObject(info, MyResponse.class);
+                MyResponse<User> user1 = JSON.parseObject(info, (Type) MyResponse.class);
                 Log.i("okhttp", JSON.toJSONString(user1));
             }
         });

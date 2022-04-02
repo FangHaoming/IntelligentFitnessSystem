@@ -11,6 +11,33 @@ public class User implements Serializable {
     private String img;
     private String imgHex;
     private String pwdHex;
+    private Article[] articles;
+    private User[] focus;
+    private User[] followers;
+
+    public Article[] getArticles() {
+        return articles;
+    }
+
+    public void setArticles(Article[] articles) {
+        this.articles = articles;
+    }
+
+    public User[] getFocus() {
+        return focus;
+    }
+
+    public void setFocus(User[] focus) {
+        this.focus = focus;
+    }
+
+    public User[] getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(User[] followers) {
+        this.followers = followers;
+    }
 
     public String getGender() {
         return gender;

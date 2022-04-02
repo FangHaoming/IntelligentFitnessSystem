@@ -57,9 +57,9 @@ public class LoginActivity extends AppCompatActivity {
         binding.registerBtn.getPaint().setAntiAlias(true);
 
 
-        binding.phone.setText(global_sp.getString("phone", ""));
         if (global_sp.getBoolean("isRemember", false)) {
-            binding.pwd.setText(global_sp.getString("pwdHex", ""));
+            binding.phone.setText(localUser.getPhone());
+            binding.pwd.setText(localUser.getPwdHex());
             binding.loginBtn.setEnabled(true);
             binding.checkPwd.setChecked(true);
         } else {

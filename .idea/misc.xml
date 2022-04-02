@@ -3,13 +3,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/btn_enable.xml" value="0.2921875" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/btn_is_can.xml" value="0.259375" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/btn_unable.xml" value="0.2921875" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/oval.xml" value="0.35" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/red_pot.xml" value="0.38229166666666664" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/tab_ic_community_selector.xml" value="0.26145833333333335" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/tab_text_color_selector.xml" value="0.26145833333333335" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_article_detail.xml" value="0.2760416666666667" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_login.xml" value="0.25" />
-        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_register.xml" value="0.24322916666666666" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_modify.xml" value="0.286231884057971" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_register.xml" value="0.25" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_search.xml" value="0.29030797101449274" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/item_tab.xml" value="0.2598958333333333" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_article_adapter.xml" value="0.33" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_detect.xml" value="0.33" />
@@ -21,7 +26,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

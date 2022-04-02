@@ -7,12 +7,21 @@ import android.content.SharedPreferences;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTabHost;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.intelligentfitnesssystem.bean.Article;
+import com.example.intelligentfitnesssystem.bean.ArticleList;
+import com.example.intelligentfitnesssystem.bean.MyResponse;
 import com.example.intelligentfitnesssystem.bean.User;
+import com.example.intelligentfitnesssystem.util.Http;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MyApplication extends Application {
 
@@ -46,6 +55,39 @@ public class MyApplication extends Application {
         } else
             localUser = new User();
         isLogin = global_sp.getBoolean("isLogin", false);
+        if (isLogin) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //获取精选动态
+                        MyResponse<ArticleList> hot = JSON.parseObject(Http.getArticleList(context, "hot", 1, 3), (Type) MyResponse.class);
+                        if (hot.getStatus() == 0) {
+                            JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(hot.getData())).get("articles");
+                            System.out.println("*****hot"+jsonArray);
+                            if (jsonArray != null) {
+                                for (Object object : jsonArray) {
+                                    chosenArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
+                                }
+                            }
+                        }
+                        //获取精选动态
+                        MyResponse<ArticleList> newest = JSON.parseObject(Http.getArticleList(context, "newest", 1, 3), (Type) MyResponse.class);
+                        if (newest.getStatus() == 0) {
+                            JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(newest.getData())).get("articles");
+                            System.out.println("*****newest"+jsonArray);
+                            if (jsonArray != null) {
+                                for (Object object : jsonArray) {
+                                    latestArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
     }
 
     public static void setTabHost(FragmentTabHost fragmentTabHost, Context context, FragmentManager fragmentManager) {
