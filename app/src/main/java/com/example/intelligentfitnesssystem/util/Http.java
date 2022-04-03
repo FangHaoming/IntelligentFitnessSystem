@@ -188,8 +188,6 @@ public class Http {
     }
 
     public static String getUserInfo(Context context, String phone) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
         String url = path + "/" + phone;
         Request request = new Request.Builder()

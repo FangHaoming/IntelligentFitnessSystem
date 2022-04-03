@@ -1,5 +1,8 @@
 package com.example.intelligentfitnesssystem.activity;
 
+import static com.example.intelligentfitnesssystem.MyApplication.localUser;
+import static com.example.intelligentfitnesssystem.MyApplication.setCurrentTab;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,7 +48,10 @@ public class SearchActivity extends AppCompatActivity {
         binding.back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                back();
+                Intent intent = new Intent(SearchActivity.this, MainActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, R.anim.slide_right_out);
+                finish();
             }
         });
         binding.searchBtn.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +61,8 @@ public class SearchActivity extends AppCompatActivity {
                 boolean isPhoneValid = binding.input.getText().toString().trim().length() == 11;
                 if (isPhoneValid) {
                     handleSearch(getApplicationContext(), phone);
+                } else {
+                    Toast.makeText(SearchActivity.this, getResources().getString(R.string.hint_phone), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -68,9 +76,10 @@ public class SearchActivity extends AppCompatActivity {
                     MyResponse<User> result = JSON.parseObject(Http.getUserInfo(context, phone), (Type) MyResponse.class);
                     switch (result.getStatus()) {
                         case 0:
-                            Intent intent = new Intent(SearchActivity.this, LoginActivity.class);
+                            Intent intent = new Intent(SearchActivity.this, UserInfoActivity.class);
                             intent.putExtra("User", JSON.toJSONString(result.getData()));
                             startActivity(intent);
+                            finish();
                             break;
                         case 1:
                             Looper.prepare();
@@ -85,12 +94,6 @@ public class SearchActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void back() {
-        Intent intent = new Intent(SearchActivity.this, MainActivity.class);
-        startActivity(intent);
-        overridePendingTransition(0, R.anim.slide_right_out);
-        finish();
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

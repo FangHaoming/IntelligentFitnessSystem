@@ -11,12 +11,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bumptech.glide.Glide;
+import com.example.intelligentfitnesssystem.activity.ArticleDetailActivity;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
+import com.example.intelligentfitnesssystem.activity.ReleaseArticleActivity;
 import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
@@ -54,9 +57,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
-//            Glide.with(mContext).load(list.get(position).getImg()[0]).into(((ListViewHolder) holder).head); //TODO 改为头像路径
-            ((ListViewHolder) holder).nickname.setText(String.valueOf(list.get(position).getUserId()));//TODO 改为昵称
-            ((ListViewHolder) holder).createTime.setText(list.get(position).getCreateTime());//TODO 改为昵称
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + list.get(position).getPublisherImg()).into(((ListViewHolder) holder).head);
+            ((ListViewHolder) holder).nickname.setText(String.valueOf(list.get(position).getPublisherName()));
+            ((ListViewHolder) holder).createTime.setText(list.get(position).getCreateTime());
             ((ListViewHolder) holder).focus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -82,23 +85,24 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             ((ListViewHolder) holder).content_text.setText(list.get(position).getText());
-            if (list.get(position).getImg().length > 0 && !list.get(position).getImg()[0].split("/.")[1].equals("mp4")) {
+            if (list.get(position).getImg().length > 0 && !list.get(position).getImg()[0].split("\\.")[1].equals("mp4")) {
                 if (list.get(position).getImg()[0] != null) {
                     ((ListViewHolder) holder).img_0.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + list.get(position).getImg()[0]).into(((ListViewHolder) holder).img_0);
+                    ((ListViewHolder) holder).img_0.setImageResource(R.drawable.img_preview);
+                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[0]).into(((ListViewHolder) holder).img_0);
                 }
-                if (list.get(position).getImg()[1] != null) {
+                if (list.get(position).getImg().length > 1 && list.get(position).getImg()[1] != null) {
                     ((ListViewHolder) holder).img_1.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + list.get(position).getImg()[1]).into(((ListViewHolder) holder).img_1);
+                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[1]).into(((ListViewHolder) holder).img_1);
                 }
-                if (list.get(position).getImg()[2] != null) {
+                if (list.get(position).getImg().length > 2 && list.get(position).getImg()[2] != null) {
                     ((ListViewHolder) holder).img_2.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + list.get(position).getImg()[2]).into(((ListViewHolder) holder).img_2);
+                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[2]).into(((ListViewHolder) holder).img_2);
                 }
             }
-            if (list.get(position).getImg().length == 1 && list.get(position).getImg()[0].split("/.")[1].equals("mp4")) {
+            if (list.get(position).getImg().length == 1 && list.get(position).getImg()[0].split("\\.")[1].equals("mp4")) {
                 ((ListViewHolder) holder).video.setVisibility(View.VISIBLE);
-                ((ListViewHolder) holder).video.bind(list.get(position).getImg()[0]);
+                ((ListViewHolder) holder).video.bind(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[0]);
             }
 
             ((ListViewHolder) holder).praise.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +117,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ((ListViewHolder) holder).comment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext.getApplicationContext(), LoginActivity.class); //TODO 跳转到动态详情页
+                    Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class); //TODO 跳转到动态详情页
                     mContext.startActivity(intent);
                 }
             });
@@ -121,7 +125,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ((ListViewHolder) holder).transport.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext.getApplicationContext(), LoginActivity.class); //TODO 跳转到发布动态页
+                    Intent intent = new Intent(mContext.getApplicationContext(), ReleaseArticleActivity.class); //TODO 跳转到发布动态页
                     mContext.startActivity(intent);
                 }
             });

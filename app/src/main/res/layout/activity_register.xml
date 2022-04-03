@@ -15,8 +15,6 @@
             android:background="@drawable/back_arrow" />
     </LinearLayout>
 
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,9 +25,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:text="手机号注册"
-            android:textSize="30dp"
+            android:layout_gravity="start"
+            android:text="@string/phone_register"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:layout_marginBottom="30dp"
             />
@@ -40,20 +38,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="用户名"
+                android:text="@string/nickname"
                 android:ems="4"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textStyle="bold"/>
             <EditText
-
-                android:hint="请填写用户名"
+                android:hint="@string/hint_nickname"
                 android:ems="10"
                 android:id="@+id/name"
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:padding="10dp"
                 android:inputType="textPersonName"
-                />
+                android:autofillHints="" />
         </LinearLayout>
 
         <LinearLayout
@@ -63,19 +60,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="手机号"
+                android:text="@string/phone"
                 android:ems="4"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textStyle="bold"/>
             <EditText
-                android:hint="填写手机号"
+                android:hint="@string/hint_phone"
                 android:maxLength="11"
                 android:id="@+id/phone"
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:padding="10dp"
-                android:inputType="textPersonName"
-                />
+                android:inputType="phone"
+                android:autofillHints="" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
@@ -84,20 +81,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="密码"
+                android:text="@string/pwd"
                 android:ems="4"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textStyle="bold"/>
             <EditText
-
-                android:hint="输入密码"
+                android:hint="@string/hint_pwd"
                 android:ems="10"
                 android:id="@+id/pwd"
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:padding="10dp"
                 android:inputType="textPassword"
-                />
+                android:autofillHints="" />
         </LinearLayout>
 
 
@@ -108,20 +104,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="确认密码"
+                android:text="@string/confirm_pwd"
                 android:ems="4"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textStyle="bold"/>
             <EditText
-
-                android:hint="再次输入密码"
+                android:hint="@string/hint_confirm_pwd"
                 android:ems="10"
                 android:id="@+id/confirm_pwd"
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:padding="10dp"
                 android:inputType="textPassword"
-                />
+                android:autofillHints="" />
         </LinearLayout>
 
         <Button
@@ -133,7 +128,7 @@
             android:background="@drawable/btn_is_can"
             android:textColor="@color/black"
             android:layout_gravity="center"
-            android:text="注册"
+            android:text="@string/register"
             />
     </LinearLayout>
 

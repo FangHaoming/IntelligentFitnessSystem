@@ -55,39 +55,56 @@ public class MyApplication extends Application {
         } else
             localUser = new User();
         isLogin = global_sp.getBoolean("isLogin", false);
-        if (isLogin) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        //获取精选动态
-                        MyResponse<ArticleList> hot = JSON.parseObject(Http.getArticleList(context, "hot", 1, 3), (Type) MyResponse.class);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //获取关注列表
+                    if (isLogin && focusArticleList.size() == 0) {
+                        MyResponse<ArticleList> follow = JSON.parseObject(Http.getArticleList(context, "follow", 1, 10), (Type) MyResponse.class);
+                        if (follow.getStatus() == 0) {
+                            JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(follow.getData())).get("articles");
+                            System.out.println("*****hot" + jsonArray);
+                            if (jsonArray != null) {
+                                for (Object object : jsonArray) {
+                                    focusArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
+                                }
+                            }
+                        }
+                    }
+                    //获取精选动态
+                    if (chosenArticleList.size() == 0) {
+                        MyResponse<ArticleList> hot = JSON.parseObject(Http.getArticleList(context, "hot", 1, 5), (Type) MyResponse.class);
                         if (hot.getStatus() == 0) {
                             JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(hot.getData())).get("articles");
-                            System.out.println("*****hot"+jsonArray);
+                            System.out.println("*****hot" + jsonArray);
                             if (jsonArray != null) {
                                 for (Object object : jsonArray) {
                                     chosenArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
                                 }
                             }
                         }
-                        //获取精选动态
-                        MyResponse<ArticleList> newest = JSON.parseObject(Http.getArticleList(context, "newest", 1, 3), (Type) MyResponse.class);
+                    }
+                    //获取精选动态
+                    if (latestArticleList.size() == 0) {
+                        MyResponse<ArticleList> newest = JSON.parseObject(Http.getArticleList(context, "newest", 1, 10), (Type) MyResponse.class);
                         if (newest.getStatus() == 0) {
                             JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(newest.getData())).get("articles");
-                            System.out.println("*****newest"+jsonArray);
+                            System.out.println("*****newest" + jsonArray);
                             if (jsonArray != null) {
                                 for (Object object : jsonArray) {
                                     latestArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
                                 }
                             }
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }).start();
-        }
+            }
+        }).start();
+
     }
 
     public static void setTabHost(FragmentTabHost fragmentTabHost, Context context, FragmentManager fragmentManager) {

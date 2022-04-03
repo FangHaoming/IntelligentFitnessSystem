@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.intelligentfitnesssystem.MainActivity;
+import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.databinding.ActivityModifyBinding;
 
@@ -27,7 +28,17 @@ public class ModifyInfoActivity extends AppCompatActivity {
         binding = ActivityModifyBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
+        binding.back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ModifyInfoActivity.this, MainActivity.class);
+                startActivity(intent);
+                overridePendingTransition(0, R.anim.slide_right_out);
+                finish();
+            }
+        });
 
         binding.logOutBtn.setOnClickListener(new View.OnClickListener() {
             @Override

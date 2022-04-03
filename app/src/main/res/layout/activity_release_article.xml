@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:layout_height="match_parent">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:background="@color/bar"
@@ -29,39 +28,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="20sp"
             android:textColor="@color/text_normal"
-            android:text="@string/bar_search"/>
+            android:text="@string/bar_release_article"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.1dp"
         android:background="@color/text_normal"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:id="@+id/back_arrow">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_phone"
-            android:inputType="phone"
-            android:maxLength="11"
-            android:layout_weight="1"
-            android:id="@+id/input"
-            android:autofillHints="@string/hint_phone" />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_weight="3"
-            android:text="@string/click_to_search"
-            android:textColor="@color/white"
-            android:background="@drawable/btn_is_can"
-            android:enabled="false"
-            android:id="@+id/searchBtn"/>
-    </LinearLayout>
 
 </LinearLayout>

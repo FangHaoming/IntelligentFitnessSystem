@@ -81,41 +81,6 @@ public class PracticeFragment extends Fragment {
         return view;
     }
 
-    /**
-     * 获取用户信息
-     *
-     * @param user_id
-     * @param phone
-     * @param user_nickname
-     */
-    public void sendByPost(int user_id, String phone, String user_nickname) {
-        User user = new User();
-        user.setId(user_id);
-        user.setNickname(user_nickname);
-        user.setPhone(phone);
-        String path = "http://172.16.213.177:8080" + "/users/";
-        OkHttpClient client = new OkHttpClient();
-        MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
-        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
-        Request request = new Request.Builder()
-                .url(path)
-                .post(requestBody)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                String info = response.body().string();
-                MyResponse<User> user1 = JSON.parseObject(info, (Type) MyResponse.class);
-                Log.i("okhttp", JSON.toJSONString(user1));
-            }
-        });
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();

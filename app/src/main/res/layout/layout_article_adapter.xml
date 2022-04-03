@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingVertical="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
         android:paddingHorizontal="10dp"
         android:orientation="horizontal">
 
@@ -22,7 +24,6 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/user_img" />
-
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,7 +48,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@+id/nickname"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="15dp"
                 android:textSize="11sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:id="@+id/createTime"/>
@@ -73,10 +74,10 @@
 
     <TextView
         android:id="@+id/content_text"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="这是动态"
         android:textColor="@color/text_selected"
         android:textSize="16sp" />
 
@@ -87,70 +88,80 @@
 
         <ImageView
             android:id="@+id/image_0"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="2dp"
             android:layout_weight="1"
-            android:src="@drawable/user_img" />
-
+            android:src="@drawable/img_preview"
+            android:contentDescription="@string/nothing" />
         <ImageView
             android:id="@+id/image_1"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="2dp"
             android:layout_weight="1"
-            android:src="@drawable/user_img" />
+            android:src="@drawable/user_img"
+            android:contentDescription="@string/nothing"/>
 
         <ImageView
             android:id="@+id/image_2"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="2dp"
             android:layout_weight="1"
-            android:src="@drawable/user_img" />
+            android:src="@drawable/user_img"
+            android:contentDescription="@string/nothing"/>
     </LinearLayout>
 
     <cn.ittiger.player.VideoPlayerView
         android:id="@+id/content_video"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="200dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:paddingTop="5dp"
+        android:paddingHorizontal="5dp"
+        android:paddingBottom="10dp"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/praise"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/praise" />
 
         <TextView
             android:id="@+id/praise_num"
-            android:layout_width="80dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="153" />
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:gravity="start"
+            tools:ignore="RtlSymmetry" />
 
         <Button
             android:id="@+id/comment"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/comment" />
 
         <TextView
             android:id="@+id/comment_num"
-            android:layout_width="80dp"
-            android:layout_height="30dp"
-            android:gravity="center"
-            android:text="153" />
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="5dp"
+            android:gravity="start"
+            tools:ignore="RtlSymmetry" />
 
         <Button
             android:id="@+id/transport"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/transport" />
     </LinearLayout>
 

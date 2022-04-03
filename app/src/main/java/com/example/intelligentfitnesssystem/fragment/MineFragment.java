@@ -118,7 +118,6 @@ public class MineFragment extends Fragment {
             binding.userName.setText(localUser.getNickname());
             binding.focusNum.setText(String.valueOf(localUser.getFocus().length));
             binding.followerNum.setText(String.valueOf(localUser.getFollowers().length));
-            //TODO 设置用户信息
         } else {
             binding.userImg.setImageResource(R.drawable.user_img);
             binding.userName.setText(R.string.click_to_login);

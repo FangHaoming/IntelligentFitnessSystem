@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
+import com.example.intelligentfitnesssystem.activity.ReleaseArticleActivity;
 import com.example.intelligentfitnesssystem.activity.SearchActivity;
 import com.example.intelligentfitnesssystem.adapter.ArticleAdapter;
 import com.example.intelligentfitnesssystem.bean.Article;
@@ -90,6 +91,8 @@ public class CommunityFragment extends Fragment {
                     startActivity(intent);
                     return;
                 }
+                Intent intent = new Intent(getContext(), ReleaseArticleActivity.class);
+                startActivity(intent);
             }
         });
         binding.search.setOnClickListener(new View.OnClickListener() {
@@ -103,10 +106,13 @@ public class CommunityFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
         super.onResume();
         initView();
+//        articleAdapter.setList(chosenArticleList);
+//        articleAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -131,7 +137,6 @@ public class CommunityFragment extends Fragment {
         current = tv;
         current.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         current.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_selected));
-//        articleAdapter.setList(list); //TODO 处理数据变更，通知 // 查了下资料，改变list对象，notify不起作用
         articleAdapter.setList(list);
         binding.recyclerView.setAdapter(articleAdapter);
     }

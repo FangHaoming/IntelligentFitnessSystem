@@ -12,9 +12,12 @@
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/drawable/tab_text_color_selector.xml" value="0.26145833333333335" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_article_detail.xml" value="0.2760416666666667" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_login.xml" value="0.25" />
-        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_modify.xml" value="0.286231884057971" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_look_comment.xml" value="0.27355072463768115" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_modify.xml" value="1.0" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_register.xml" value="0.25" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_release_article.xml" value="0.27355072463768115" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_search.xml" value="0.29030797101449274" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/activity_user_info.xml" value="0.27355072463768115" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/item_tab.xml" value="0.2598958333333333" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_article_adapter.xml" value="0.33" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_detect.xml" value="0.33" />
