@@ -32,6 +32,15 @@ public class Comment implements Serializable {
     private int likeCount;
 
     private int[] likeId;
+    private int commentCount;
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
 
     public int getId() {
         return id;

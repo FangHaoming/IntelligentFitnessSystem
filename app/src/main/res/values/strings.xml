@@ -28,6 +28,7 @@
     <string name="latest">最新</string>
     <string name="article">动态</string>
     <string name="nickname">用户名</string>
+    <string name="comment_area">评论区</string>
     <string name="register">注册</string>
     <string name="confirm_pwd">确认密码</string>
     <string name="phone">手机号</string>
@@ -38,7 +39,10 @@
     <string name="bar_release_article">发布动态</string>
     <string name="bar_modify">修改个人信息</string>
     <string name="bar_user">用户信息</string>
+    <string name="gender">性别</string>
+    <string name="birth">出生日期</string>
     <string name="release">发布</string>
+    <string name="save">保存</string>
     <string name="followers">粉丝</string>
     <string name="text_normal">16sp</string>
     <string name="text_selected">20sp</string>
@@ -51,7 +55,12 @@
     <string name="hint_nickname">请输入用户名</string>
     <string name="hint_confirm_pwd">再次输入密码</string>
     <string name="hint_pwd">请输入密码</string>
+    <string name="hint_pwd_diff">两次密码不一致</string>
+    <string name="hint_birth">请选择日期</string>
     <string name="hint_practice">请选择动作类型</string>
+    <string name="hint_input">请输入内容</string>
+    <string name="male">男</string>
+    <string name="female">女</string>
     <string name="info_error_server">服务器错误</string>
     <string name="info_success_login">登陆成功</string>
     <string name="nothing"> </string>

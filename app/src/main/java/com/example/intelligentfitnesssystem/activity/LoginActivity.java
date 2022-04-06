@@ -119,7 +119,6 @@ public class LoginActivity extends AppCompatActivity {
                 while (response == null) {
                 }
                 JSONObject result = JSON.parseObject(response);
-                System.out.println("**********commitLogin_response" + response);
                 JSONObject data = (JSONObject) result.get("data");
                 switch (result.getInteger("status")) {
                     case 0:

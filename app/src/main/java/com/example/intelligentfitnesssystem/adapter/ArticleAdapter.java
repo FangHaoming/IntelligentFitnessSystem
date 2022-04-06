@@ -1,5 +1,9 @@
 package com.example.intelligentfitnesssystem.adapter;
 
+import static com.example.intelligentfitnesssystem.MyApplication.localUser;
+import static java.util.Arrays.binarySearch;
+import static java.util.Arrays.sort;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -23,6 +28,7 @@ import com.example.intelligentfitnesssystem.activity.ReleaseArticleActivity;
 import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
+import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.util.Http;
 
 import java.io.IOException;
@@ -54,30 +60,62 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return new ListViewHolder(view);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
-            Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + list.get(position).getPublisherImg()).into(((ListViewHolder) holder).head);
+            if (list.get(position).getPublisherImg() != null) {
+                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + list.get(position).getPublisherImg()).into(((ListViewHolder) holder).head);
+            }
             ((ListViewHolder) holder).nickname.setText(String.valueOf(list.get(position).getPublisherName()));
             ((ListViewHolder) holder).createTime.setText(list.get(position).getCreateTime());
+            boolean[] isFocus = {false};
+            for (User user : localUser.getFocus()) {
+                if (user.getId() == list.get(position).getUserId()) {
+                    isFocus[0] = true;
+                }
+            }
+            if (isFocus[0]) {
+                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
+            }
             ((ListViewHolder) holder).focus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                System.out.println("*****item_id " + list.get(position).getUserId());
-                                MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
-                                if (result.getStatus() == 0) {
-                                    if (((ListViewHolder) holder).focus.getText().equals(mContext.getResources().getString(R.string.focus))) {
-                                        ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
-                                    } else {
-                                        ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
+                            if (!isFocus[0]) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
+                                            if (result.getStatus() == 0) {
+                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
+                                            } else {
+                                                Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                }).start();
+                            } else {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
+                                            if (result.getStatus() == 0) {
+                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
+                                            } else {
+                                                Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }).start();
                             }
                         }
                     }).start();
@@ -104,13 +142,44 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 ((ListViewHolder) holder).video.setVisibility(View.VISIBLE);
                 ((ListViewHolder) holder).video.bind(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[0]);
             }
-
+            int[] temp = list.get(position).getLikeId();
+            sort(temp);
+            if (-1 != binarySearch(temp, localUser.getId())) {
+                ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+            }
             ((ListViewHolder) holder).praise.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onClick(View v) {
-                    //TODO 根据isLike判断样式
-                    ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                    if (-1 != binarySearch(temp, localUser.getId())) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
+                                    if (result.getStatus() == 0) {
+                                        ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    } else {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
+                                    if (result.getStatus() == 0) {
+                                        ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
                 }
             });
             ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
@@ -118,6 +187,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class); //TODO 跳转到动态详情页
+                    intent.putExtra("Article", JSON.toJSONString(list.get(position)));
                     mContext.startActivity(intent);
                 }
             });

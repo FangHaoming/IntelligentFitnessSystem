@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -29,6 +31,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.intelligentfitnesssystem.MainActivity;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.VideoFrame;
+import com.example.intelligentfitnesssystem.databinding.ActivityDetectBinding;
 import com.example.intelligentfitnesssystem.util.OkSocketSendData;
 import com.xuhao.didi.core.pojo.OriginalData;
 import com.xuhao.didi.core.protocol.IReaderProtocol;
@@ -51,103 +54,128 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class DetectActivity extends AppCompatActivity implements SurfaceHolder.Callback{
-    public ImageView iv;
-    public Button beginBtn;
-    public Button endBtn;
-    public String type;
+public class DetectActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 
+    public String type;
     public Camera camera;
     public SurfaceHolder holder;
     public IConnectionManager manager;
-    public SurfaceView surfaceView;
-    public LinkedList<VideoFrame> rf=new LinkedList<>();
-    public int i_rf=0;
+    public LinkedList<VideoFrame> rf = new LinkedList<>();
+    public int i_rf = 0;
     public Timer timer;
+    private ActivityDetectBinding binding;
+    private boolean isBegin = true;
+    private boolean isPause = false;
 
     @Override
-    protected void onCreate(@Nullable  Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_detect);
+        binding = ActivityDetectBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        iv=findViewById(R.id.iv);
-        surfaceView=findViewById(R.id.sfv);
-        beginBtn=findViewById(R.id.begin);
-        endBtn=findViewById(R.id.end);
-        holder=surfaceView.getHolder();
-        timer=new Timer();
-        Intent intent=getIntent();
-        type=intent.getStringExtra("type");
-        Toast.makeText(DetectActivity.this,type,Toast.LENGTH_SHORT).show();
-        View.OnClickListener listener=new View.OnClickListener() {
+        holder = binding.sfv.getHolder();
+        timer = new Timer();
+        Intent intent = getIntent();
+        type = intent.getStringExtra("type");
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        binding.switchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch(v.getId()) {
-                    case R.id.begin:    
-                        surfaceView.setVisibility(View.VISIBLE);
+                if (isPause) {
+                    //pause
+                    binding.switchBtn.setImageResource(R.drawable.pause);
+                    isPause = false;
+                    isBegin = true;
+                    //TODO 暂停后继续录制
+                }
+                if (isBegin) {
+                    //begin
+                    binding.sfv.setVisibility(View.VISIBLE);
 //                        initOksocket("192.168.43.200", 8004, null);
 //                        manager.connect();
-                        requestSocket(type);
-
-                        break;
-                    case R.id.end:
-                        if(manager!=null&&manager.isConnect()){
-                            manager.disconnect();
-                        }
-                        //iv.setImageBitmap(null);
-                        surfaceView.setVisibility(View.GONE);
-                        break;
-                    default:
-                        break;
+                    requestSocket(type);
+                    binding.switchBtn.setImageResource(R.drawable.pause);
+                    binding.end.setVisibility(View.VISIBLE);
+                    binding.download.setVisibility(View.GONE);
+                    isBegin = false;
+                }else{
+                    //to pause
+                    binding.download.setVisibility(View.VISIBLE);
+                    binding.switchBtn.setImageResource(R.drawable.head_on);
+                    isPause = true;
                 }
+
             }
-        };
-        beginBtn.setOnClickListener(listener);
-        endBtn.setOnClickListener(listener);
+        });
+        binding.end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (manager != null && manager.isConnect()) {
+                    manager.disconnect();
+                }
+                //iv.setImageBitmap(null);
+
+                binding.sfv.setVisibility(View.GONE);
+                binding.end.setVisibility(View.GONE);
+                binding.switchBtn.setImageResource(R.drawable.record);
+                binding.download.setVisibility(View.VISIBLE);
+                isBegin = true;
+            }
+        });
+        binding.download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO 合成视频并保存到本地
+            }
+        });
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        Intent intent=new Intent(DetectActivity.this, MainActivity.class);
+        Intent intent = new Intent(DetectActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
         return super.onSupportNavigateUp();
     }
 
-    public void show(){
-        TimerTask task=new TimerTask() {
+    public void show() {
+        TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.i("timer rf.size()=",rf.size()+"");
-                        if(i_rf< rf.size()){
-                            Log.i("timer i=",i_rf+"");
-                            iv.setImageBitmap(BitmapFactory.decodeByteArray(rf.get(i_rf).getData(), 0, rf.get(i_rf).getData().length));
+                        Log.i("timer rf.size()=", rf.size() + "");
+                        if (i_rf < rf.size()) {
+                            Log.i("timer i=", i_rf + "");
+                            binding.iv.setImageBitmap(BitmapFactory.decodeByteArray(rf.get(i_rf).getData(), 0, rf.get(i_rf).getData().length));
                             i_rf++;
                         }
                     }
                 });
             }
         };
-        if(i_rf<rf.size()){
-            timer.schedule(task,0,63);
-        }else{
+        if (i_rf < rf.size()) {
+            timer.schedule(task, 0, 63);
+        } else {
             timer.cancel();
         }
     }
 
-    public void initOksocket(String host,int port,String pos){
+    public void initOksocket(String host, int port, String pos) {
         ConnectionInfo info = new ConnectionInfo(host, port);
-        manager= OkSocket.open(info);
-        OkSocketOptions options=manager.getOption();
-        OkSocketOptions.Builder builder=new OkSocketOptions.Builder(options);
+        manager = OkSocket.open(info);
+        OkSocketOptions options = manager.getOption();
+        OkSocketOptions.Builder builder = new OkSocketOptions.Builder(options);
         builder.setReaderProtocol(new IReaderProtocol() {
             @Override
             public int getHeaderLength() {
                 return 16;
             }
+
             @Override
             public int getBodyLength(byte[] header, ByteOrder byteOrder) {
                 return Integer.parseInt(new String(header).trim());
@@ -158,13 +186,13 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
             @Override
             public void onSocketConnectionSuccess(ConnectionInfo info, String action) {
                 super.onSocketConnectionSuccess(info, action);
-                Log.i("socket***conn","connected");
+                Log.i("socket***conn", "connected");
 
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
 
-                        try{
+                        try {
                             camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                         } catch (RuntimeException e) {
                             e.printStackTrace();
@@ -173,19 +201,19 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         //获取相机参数
                         Camera.Parameters parameters = camera.getParameters();
                         //获取相机支持的预览的大小
-                        DisplayMetrics dm=getResources().getDisplayMetrics();
+                        DisplayMetrics dm = getResources().getDisplayMetrics();
 //                        Camera.Size previewSize=getCameraPreviewSize(parameters);
 //                        Camera.Size previewSize = getBestCameraResolution(parameters,getScreenMetrics(DetectActivity.this));
 //                        int width=previewSize.width;
 //                        int height=previewSize.height;
-                        int width=640;
-                        int height=480;
+                        int width = 640;
+                        int height = 480;
 //                        int width =dm.widthPixels;// previewSizFe.width; //640
 //                        int height = dm.heightPixels;// previewSize.height;//480
                         //设置预览格式（也就是每一帧的视频格式）YUV420下的NV21
                         parameters.setPreviewFormat(ImageFormat.NV21);
-                        List<int[]> fps=parameters.getSupportedPreviewFpsRange();
-                        parameters.setPreviewFpsRange(fps.get(0)[0],fps.get(0)[1]);
+                        List<int[]> fps = parameters.getSupportedPreviewFpsRange();
+                        parameters.setPreviewFpsRange(fps.get(0)[0], fps.get(0)[1]);
                         //设置预览图像分辨率
                         parameters.setPreviewSize(width, height);
                         //相机旋转90度
@@ -197,8 +225,8 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        OkSocketSendData s=new OkSocketSendData();
-                        if(pos!=null) {
+                        OkSocketSendData s = new OkSocketSendData();
+                        if (pos != null) {
                             s.setVideoFrame(pos.length(), pos.getBytes());
                             manager.send(s); //先发送要检测的姿态类型
                         }
@@ -208,15 +236,15 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                             @Override
                             public void onPreviewFrame(byte[] data, Camera camera) {
                                 if (manager.isDisconnecting()) return;
-                                data=rotateYUV420Degree90(data,width,height);
-                                data=rotateYUV420Degree90(data,height,width);
-                                data=rotateYUV420Degree90(data,width,height);
+                                data = rotateYUV420Degree90(data, width, height);
+                                data = rotateYUV420Degree90(data, height, width);
+                                data = rotateYUV420Degree90(data, width, height);
                                 YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, height, width, null);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 yuvimage.compressToJpeg(new Rect(0, 0, height, width), 80, baos);
                                 Bitmap bmp = BitmapFactory.decodeByteArray(baos.toByteArray(), 0, baos.toByteArray().length);
                                 bmp.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-                                s.setVideoFrame(baos.toByteArray().length,baos.toByteArray());
+                                s.setVideoFrame(baos.toByteArray().length, baos.toByteArray());
                                 manager.send(s); //发送视频帧
                             }
                         });
@@ -236,17 +264,17 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
             @Override
             public void onSocketReadResponse(ConnectionInfo info, String action, OriginalData data) {
                 super.onSocketReadResponse(info, action, data);
-                int len=Integer.parseInt(new String(data.getHeadBytes()).trim());
-                String datastr=new String(data.getBodyBytes());
+                int len = Integer.parseInt(new String(data.getHeadBytes()).trim());
+                String datastr = new String(data.getBodyBytes());
 
-                Log.i("socket***rlen",len+"");
-                Log.i("socket***rdata",new String(data.getBodyBytes()));
+                Log.i("socket***rlen", len + "");
+                Log.i("socket***rdata", new String(data.getBodyBytes()));
 
-                rf.offerLast(new VideoFrame(len,data.getBodyBytes())); //存帧
+                rf.offerLast(new VideoFrame(len, data.getBodyBytes())); //存帧
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        iv.setImageBitmap(BitmapFactory.decodeByteArray(data.getBodyBytes(), 0, len)); //实时显示帧
+                        binding.iv.setImageBitmap(BitmapFactory.decodeByteArray(data.getBodyBytes(), 0, len)); //实时显示帧
                     }
                 });
             }
@@ -257,7 +285,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
      * 请求socket的host、port
      */
     public void requestSocket(String posture) {
-        String path = "http://172.16.213.177:8080"+"/postures/socket/info";
+        String path = "http://172.16.213.177:8080" + "/postures/socket/info";
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(path)
@@ -268,16 +296,17 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
             public void onFailure(okhttp3.Call call, IOException e) {
                 e.printStackTrace();
             }
+
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 String info = response.body().string();
-                JSONObject json= JSON.parseObject(info);
-                if(json.getString("msg").equals("success")){
-                    JSONObject j =json.getJSONObject("data");
-                    if(manager==null){
-                        initOksocket(j.getString("host"),j.getInteger("port"),posture);
+                JSONObject json = JSON.parseObject(info);
+                if (json.getString("msg").equals("success")) {
+                    JSONObject j = json.getJSONObject("data");
+                    if (manager == null) {
+                        initOksocket(j.getString("host"), j.getInteger("port"), posture);
                     }
-                    if(null!=manager&&!manager.isConnect()){
+                    if (null != manager && !manager.isConnect()) {
                         manager.connect();
 
                     }
@@ -286,6 +315,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
             }
         });
     }
+
     /**
      * 获取设备支持的最小分辨率
      */
@@ -402,8 +432,8 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK){
-            Intent intent=new Intent(DetectActivity.this, MainActivity.class);
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent intent = new Intent(DetectActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         }

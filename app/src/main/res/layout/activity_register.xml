@@ -49,8 +49,7 @@
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:padding="10dp"
-                android:inputType="textPersonName"
-                android:autofillHints="" />
+                android:inputType="textPersonName"/>
         </LinearLayout>
 
         <LinearLayout
@@ -72,7 +71,7 @@
                 android:layout_height="50dp"
                 android:padding="10dp"
                 android:inputType="phone"
-                android:autofillHints="" />
+                 />
         </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
@@ -93,7 +92,7 @@
                 android:layout_height="50dp"
                 android:padding="10dp"
                 android:inputType="textPassword"
-                android:autofillHints="" />
+                />
         </LinearLayout>
 
 
@@ -116,20 +115,19 @@
                 android:layout_height="50dp"
                 android:padding="10dp"
                 android:inputType="textPassword"
-                android:autofillHints="" />
+                />
         </LinearLayout>
 
         <Button
             android:id="@+id/registerBtn"
-            android:layout_marginTop="15dp"
             android:layout_width="250dp"
-            android:enabled="false"
-            android:layout_height="35dp"
-            android:background="@drawable/btn_is_can"
-            android:textColor="@color/black"
+            android:layout_height="48dp"
             android:layout_gravity="center"
-            android:text="@string/register"
-            />
+            android:layout_marginTop="15dp"
+            android:background="@drawable/btn_is_can"
+            android:enabled="false"
+            android:textColor="@color/white"
+            android:text="@string/register" />
     </LinearLayout>
 
 </LinearLayout>

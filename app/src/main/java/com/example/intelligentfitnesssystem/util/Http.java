@@ -75,7 +75,6 @@ public class Http {
     }
 
     public static String commitArticle(Context context, Article article) throws IOException {
-
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(article), TYPE);
@@ -94,8 +93,6 @@ public class Http {
     }
 
     public static String commitComment(Context context, Comment comment) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_comment);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(comment), TYPE);
@@ -114,10 +111,8 @@ public class Http {
     }
 
     public static String modifyUser(Context context, User user) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
-        String url = path + "/" + local_sp.getInt("user_id", 0);
+        String url = path + "/" + localUser.getId();
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
         Request request = new Request.Builder()
@@ -142,6 +137,25 @@ public class Http {
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)
+                .addHeader("token", local_sp.getString("token", ""))
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        Response response = call.execute();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
+    }
+
+    public static String unFollowUser(Context context, int userId) throws IOException {
+        String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
+        String url = path + "/" + userId + "/followers/" + localUser.getId();
+        MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
+        RequestBody requestBody = RequestBody.Companion.create("", TYPE);
+        Request request = new Request.Builder()
+                .url(url)
+                .delete(requestBody)
                 .addHeader("token", local_sp.getString("token", ""))
                 .build();
         OkHttpClient client = new OkHttpClient();
@@ -205,10 +219,26 @@ public class Http {
     }
 
     public static String praiseArticle(Context context, int articleId) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
-        String url = path + "/" + articleId + "/like/" + local_sp.getInt("user_id", 0);
+        String url = path + "/" + articleId + "/like/" + localUser.getId();
+        MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
+        RequestBody requestBody = RequestBody.Companion.create("", TYPE);
+        Request request = new Request.Builder()
+                .url(url)
+                .patch(requestBody)
+                .addHeader("token", local_sp.getString("token", ""))
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        Response response = call.execute();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
+    }
+    public static String cancelPraiseArticle(Context context, int articleId) throws IOException {
+        String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
+        String url = path + "/" + articleId + "/dislike/" + localUser.getId();
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create("", TYPE);
         Request request = new Request.Builder()
@@ -226,10 +256,27 @@ public class Http {
     }
 
     public static String praiseComment(Context context, int commentId) throws IOException {
-        SharedPreferences global_sp = context.getSharedPreferences("data_global", Context.MODE_PRIVATE);
-        SharedPreferences local_sp = context.getSharedPreferences("data_" + global_sp.getString("user_id", ""), Context.MODE_PRIVATE);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
         String url = path + "/comments/" + commentId + "/like/" + local_sp.getInt("user_id", 0);
+        MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
+        RequestBody requestBody = RequestBody.Companion.create("", TYPE);
+        Request request = new Request.Builder()
+                .url(url)
+                .patch(requestBody)
+                .addHeader("token", local_sp.getString("token", ""))
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        Response response = call.execute();
+        if(response.isSuccessful()){
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
+    }
+
+    public static String cancelPraiseComment(Context context, int commentId) throws IOException {
+        String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
+        String url = path + "/comments/" + commentId + "/dislike/" + localUser.getId();
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create("", TYPE);
         Request request = new Request.Builder()
