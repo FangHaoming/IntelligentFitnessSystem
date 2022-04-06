@@ -8,6 +8,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:id="@+id/head_area"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_height="50dp">
         <TextView
             android:layout_width="20dp"
@@ -29,6 +31,11 @@
             android:textSize="20sp"
             android:textColor="@color/text_normal"
             android:text="@string/bar_article"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/text_normal"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
@@ -191,9 +198,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:id="@+id/comment_area_num"
                 android:textColor="@color/text_selected"
                 android:layout_margin="10dp"
-                android:text="评论(23)"/>
+                android:text="评论(0)"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -215,6 +223,8 @@
             android:id="@+id/commentInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_weight="1"
             android:padding="5dp"
             android:background="@drawable/oval"

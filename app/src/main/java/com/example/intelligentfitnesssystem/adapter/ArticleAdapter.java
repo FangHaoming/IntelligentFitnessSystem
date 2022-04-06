@@ -7,6 +7,7 @@ import static java.util.Arrays.sort;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,7 +110,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                             if (result.getStatus() == 0) {
                                                 ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
                                             } else {
+                                                Looper.prepare();
                                                 Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                                Looper.loop();
                                             }
                                         } catch (IOException e) {
                                             e.printStackTrace();

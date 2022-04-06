@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,6 +33,7 @@ import com.example.intelligentfitnesssystem.util.Http;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.ittiger.player.VideoPlayerView;
@@ -46,11 +48,19 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public CommentAdapter(Context mContext, List<Comment> list) {
         this.mContext = mContext;
-        this.list = list;
+        this.list = new ArrayList(list);
     }
 
     public void setIsShowCommentBtn(Boolean isShowCommentBtn) {
         this.isShowCommentBtn = isShowCommentBtn;
+    }
+
+    public void addItemCommentCount() {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId() == commentId) {
+                list.get(i).setCommentCount(list.get(i).getCommentCount() + 1);
+            }
+        }
     }
 
     public void setEditText(EditText et) {
@@ -61,9 +71,10 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void setList(List<Comment> list) {
         this.list = list;
     }
-    public void addData(Comment comment){
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void addData(Comment comment) {
         this.list.add(comment);
-        this.notifyDataSetChanged();
     }
 
     @NonNull
@@ -86,21 +97,23 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             int[] temp = list.get(position).getLikeId();
             sort(temp);
-            if (-1 != binarySearch(temp, localUser.getId())) {
+            int index = binarySearch(temp, localUser.getId());
+            if (-1 != index) {
                 ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
             }
             ((ListViewHolder) holder).praise.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onClick(View v) {
-                    if (-1 != binarySearch(temp, localUser.getId())) {
+                    if (-1 != index) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(mContext, list.get(position).getCommentId()), (Type) MyResponse.class);
+                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
                                     if (result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount() - 1));
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -112,9 +125,10 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             @Override
                             public void run() {
                                 try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.praiseComment(mContext, list.get(position).getCommentId()), (Type) MyResponse.class);
+                                    MyResponse<Object> result = JSON.parseObject(Http.praiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
                                     if (result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount() + 1));
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -132,7 +146,10 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 public void onClick(View v) {
                     if (et != null) {
                         et.requestFocus();
-                        commentId = list.get(position).getCommentId();
+                        commentId = list.get(position).getId();
+                        System.out.println("*****commentId:" + commentId);
+                        InputMethodManager inputMethodManager = (InputMethodManager) et.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputMethodManager.showSoftInput(et, 0);
                     }
                 }
             });

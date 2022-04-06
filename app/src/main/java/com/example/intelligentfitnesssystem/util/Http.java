@@ -113,10 +113,12 @@ public class Http {
     public static String modifyUser(Context context, User user) throws IOException {
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
         String url = path + "/" + localUser.getId();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("user", user);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
-        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
+        RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(jsonObject), TYPE);
         Request request = new Request.Builder()
-                .url(path)
+                .url(url)
                 .put(requestBody)
                 .addHeader("token", local_sp.getString("token", ""))
                 .build();
@@ -257,7 +259,7 @@ public class Http {
 
     public static String praiseComment(Context context, int commentId) throws IOException {
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
-        String url = path + "/comments/" + commentId + "/like/" + local_sp.getInt("user_id", 0);
+        String url = path + "/comments/" + commentId + "/like/" + localUser.getId();
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create("", TYPE);
         Request request = new Request.Builder()

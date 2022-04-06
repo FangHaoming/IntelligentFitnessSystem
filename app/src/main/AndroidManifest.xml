@@ -81,7 +81,7 @@
         </activity>
         <activity
             android:name=".activity.ArticleDetailActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden">
+            android:windowSoftInputMode="adjustUnspecified|stateVisible">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

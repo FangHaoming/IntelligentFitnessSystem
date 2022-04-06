@@ -8,6 +8,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.RadioGroup;
@@ -50,6 +51,9 @@ public class ModifyInfoActivity extends AppCompatActivity {
 
         user = new User();
 
+        binding.name.setText(localUser.getNickname());
+        binding.birth.setText(localUser.getBirth());
+
         binding.back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,16 +64,16 @@ public class ModifyInfoActivity extends AppCompatActivity {
             }
         });
 
-        if(localUser.getGender().equals("男")){
+        if (localUser.getGender() != null && localUser.getGender().trim().equals("男")) {
             binding.male.setChecked(true);
-        }else if(localUser.getGender().equals("女")){
+        } else if (localUser.getGender() != null && localUser.getGender().trim().equals("女")) {
             binding.female.setChecked(true);
         }
 
         binding.gender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
+                switch (checkedId) {
                     case R.id.male:
                         user.setGender("男");
                         break;
@@ -103,25 +107,41 @@ public class ModifyInfoActivity extends AppCompatActivity {
             }
         });
 
-        binding.save.setOnClickListener(new View.OnClickListener() {
+        binding.saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 user.setNickname(binding.name.getText().toString().trim());
                 user.setBirth(binding.birth.getText().toString().trim());
-                if (binding.pwd.getText().toString().equals(binding.confirmPwd.getText().toString())) {
-                    user.setPwdHex(FileUtils.sha1String(binding.pwd.getText().toString()));
+                user.setPhone(localUser.getPhone());
+                if (binding.pwd.getText().toString().trim().equals(binding.confirmPwd.getText().toString().trim())) {
+                    if (!binding.pwd.getText().toString().trim().equals("")) {
+                        user.setPwdHex(FileUtils.sha1String(binding.pwd.getText().toString()));
+                    } else {
+                        user.setPwdHex(localUser.getPwdHex());
+                    }
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             MyResponse<User> result = null;
                             try {
+                                System.out.println("******modify req:" + JSON.toJSONString(user));
                                 result = JSON.parseObject(Http.modifyUser(ModifyInfoActivity.this, user), (Type) MyResponse.class);
                                 if (result.getStatus() == 0) {
-                                    localUser = result.getData();
+                                    User user_res = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
+                                    localUser.setNickname(user_res.getNickname());
+                                    localUser.setGender(user_res.getGender());
+                                    localUser.setPwdHex(user_res.getPwdHex());
+                                    localUser.setBirth(user_res.getBirth());
                                     local_editor.putString("localUser", JSON.toJSONString(localUser));
                                     local_editor.apply();
-                                }else{
+                                    Intent intent = new Intent(ModifyInfoActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Looper.prepare();
                                     Toast.makeText(ModifyInfoActivity.this, getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                    Looper.loop();
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
