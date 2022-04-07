@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:paddingTop="20dp"
-        android:paddingBottom="10dp"
         android:paddingHorizontal="10dp"
         android:orientation="horizontal">
         <de.hdodenhof.circleimageview.CircleImageView
@@ -30,31 +29,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:textColor="@color/text_selected"
-                android:text="asdfasdf" />
+                android:textColor="@color/text_selected" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="11sp"
-                android:text="asdfasdg"
                 android:id="@+id/createTime"/>
-            <TextView
-                android:layout_marginVertical="10dp"
-                android:id="@+id/content_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_selected"
-                android:text="asdgasdg"
-                android:textSize="20sp" />
-            <TextView
-                android:id="@+id/comment_num"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:textSize="16sp"
-                android:textColor="@color/btn_enable"
-                tools:ignore="RtlSymmetry" />
         </LinearLayout>
 
         <LinearLayout
@@ -85,6 +66,25 @@
                 tools:ignore="RtlSymmetry" />
         </LinearLayout>
     </LinearLayout>
+    <TextView
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="20dp"
+        android:maxLength="100"
+        android:id="@+id/content_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_selected"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/comment_num"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:textSize="16sp"
+        android:textColor="@color/btn_enable"
+        tools:ignore="RtlSymmetry" />
 
 
 </LinearLayout>

@@ -34,6 +34,8 @@ import com.example.intelligentfitnesssystem.util.Http;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.ittiger.player.VideoPlayerView;
@@ -43,6 +45,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private Context mContext;
     private List<Article> list;
+    private boolean isFocus = false;
+    private boolean isPraise = false;
+    private User focusedUser = new User();
 
     public ArticleAdapter(Context mContext, List<Article> list) {
         this.mContext = mContext;
@@ -70,13 +75,13 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
             ((ListViewHolder) holder).nickname.setText(String.valueOf(list.get(position).getPublisherName()));
             ((ListViewHolder) holder).createTime.setText(list.get(position).getCreateTime());
-            boolean[] isFocus = {false};
             for (User user : localUser.getFocus()) {
                 if (user.getId() == list.get(position).getUserId()) {
-                    isFocus[0] = true;
+                    isFocus = true;
+                    focusedUser = user;
                 }
             }
-            if (isFocus[0]) {
+            if (isFocus) {
                 ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
             }
             ((ListViewHolder) holder).focus.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +90,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (!isFocus[0]) {
+                            if (!isFocus) {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -93,8 +98,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                             MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
                                             if (result.getStatus() == 0) {
                                                 ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
+
                                             } else {
+                                                Looper.prepare();
                                                 Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                                Looper.loop();
                                             }
                                         } catch (IOException e) {
                                             e.printStackTrace();
@@ -108,8 +116,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                         try {
                                             MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
                                             if (result.getStatus() == 0) {
-                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
-                                            } else {
+                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus)); } else {
                                                 Looper.prepare();
                                                 Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
                                                 Looper.loop();
@@ -147,14 +154,15 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
             int[] temp = list.get(position).getLikeId();
             sort(temp);
-            if (-1 != binarySearch(temp, localUser.getId())) {
+             isPraise = -1 != binarySearch(temp, localUser.getId());
+            if (isPraise) {
                 ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
             }
             ((ListViewHolder) holder).praise.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onClick(View v) {
-                    if (-1 != binarySearch(temp, localUser.getId())) {
+                    if (isPraise) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -162,6 +170,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
                                     if (result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
+                                        list.get(position).setLikeCount(list.get(position).getLikeCount() - 1);
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        isPraise = false;
+
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -176,6 +188,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
                                     if (result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                                        list.get(position).setLikeCount(list.get(position).getLikeCount() + 1);
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        isPraise = true;
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();

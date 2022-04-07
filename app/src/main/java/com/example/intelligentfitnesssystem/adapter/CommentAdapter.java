@@ -48,7 +48,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public CommentAdapter(Context mContext, List<Comment> list) {
         this.mContext = mContext;
-        this.list = new ArrayList(list);
+        this.list = new ArrayList<>(list);
     }
 
     public void setIsShowCommentBtn(Boolean isShowCommentBtn) {
@@ -97,15 +97,15 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             int[] temp = list.get(position).getLikeId();
             sort(temp);
-            int index = binarySearch(temp, localUser.getId());
-            if (-1 != index) {
+            final boolean[] isPraise = {-1 != binarySearch(temp, localUser.getId())};
+            if (isPraise[0]) {
                 ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
             }
             ((ListViewHolder) holder).praise.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onClick(View v) {
-                    if (-1 != index) {
+                    if (isPraise[0]) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -113,7 +113,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
                                     if (result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount() - 1));
+                                        list.get(position).setLikeCount(list.get(position).getLikeCount() - 1);
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        isPraise[0] = false;
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -128,7 +130,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     MyResponse<Object> result = JSON.parseObject(Http.praiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
                                     if (result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount() + 1));
+                                        list.get(position).setLikeCount(list.get(position).getLikeCount() + 1);
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        isPraise[0] = true;
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -154,7 +158,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             if (list.get(position).getCommentCount() > 0) {
-                ((ListViewHolder) holder).comment_num.setText("查看更多" + list.get(position).getCommentCount() + "条评论");
+                ((ListViewHolder) holder).comment_num.setText("查看全部" + list.get(position).getCommentCount() + "条回复");
             }
 
         }

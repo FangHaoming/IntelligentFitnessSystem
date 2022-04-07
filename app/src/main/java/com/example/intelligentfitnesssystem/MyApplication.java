@@ -19,6 +19,7 @@ import com.example.intelligentfitnesssystem.util.Http;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,8 +28,9 @@ public class MyApplication extends Application {
 
     public static Application mApplication;
     public static User localUser = new User();
-    public static List<User> follower = new ArrayList<User>();
-    public static List<User> focus = new ArrayList<User>();
+    public static List<Article> localArticle = new ArrayList<Article>();
+    public static List<User> localFollower = new ArrayList<User>();
+    public static List<User> localFocus = new ArrayList<User>();
     public static List<Article> chosenArticleList = new ArrayList<>();
     public static List<Article> focusArticleList = new ArrayList<>();
     public static List<Article> latestArticleList = new ArrayList<>();
@@ -56,56 +58,67 @@ public class MyApplication extends Application {
         } else
             localUser = new User();
         isLogin = global_sp.getBoolean("isLogin", false);
+        //更新用户信息
+        updateUser(context);
+        //获取关注列表
+        if (isLogin && focusArticleList.size() == 0) {
+            getArticleList(context, "follow", focusArticleList, 1);
+        }
+        //获取精选动态
+        if (chosenArticleList.size() == 0) {
+            getArticleList(context, "hot", chosenArticleList, 1);
+        }
+        //获取最新动态
+        if (latestArticleList.size() == 0) {
+            getArticleList(context, "newest", latestArticleList, 1);
+        }
+    }
 
+    public static void getArticleList(Context context, String type, List<Article> list, int pageNum) {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                MyResponse<ArticleList> result = null;
                 try {
-                    //获取关注列表
-                    if (isLogin && focusArticleList.size() == 0) {
-                        MyResponse<ArticleList> follow = JSON.parseObject(Http.getArticleList(context, "follow", 1, 10), (Type) MyResponse.class);
-                        if (follow.getStatus() == 0) {
-                            JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(follow.getData())).get("articles");
-                            System.out.println("*****hot" + jsonArray);
-                            if (jsonArray != null) {
-                                for (Object object : jsonArray) {
-                                    focusArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
-                                }
-                            }
-                        }
-                    }
-                    //获取精选动态
-                    if (chosenArticleList.size() == 0) {
-                        MyResponse<ArticleList> hot = JSON.parseObject(Http.getArticleList(context, "hot", 1, 5), (Type) MyResponse.class);
-                        if (hot.getStatus() == 0) {
-                            JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(hot.getData())).get("articles");
-                            System.out.println("*****hot" + jsonArray);
-                            if (jsonArray != null) {
-                                for (Object object : jsonArray) {
-                                    chosenArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
-                                }
-                            }
-                        }
-                    }
-                    //获取精选动态
-                    if (latestArticleList.size() == 0) {
-                        MyResponse<ArticleList> newest = JSON.parseObject(Http.getArticleList(context, "newest", 1, 10), (Type) MyResponse.class);
-                        if (newest.getStatus() == 0) {
-                            JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(newest.getData())).get("articles");
-                            System.out.println("*****newest" + jsonArray);
-                            if (jsonArray != null) {
-                                for (Object object : jsonArray) {
-                                    latestArticleList.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
-                                }
-                            }
-                        }
-                    }
+                    result = JSON.parseObject(Http.getArticleList(context, type, pageNum, 10), (Type) MyResponse.class);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                if (result.getStatus() == 0) {
+                    JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
+                    if (jsonArray != null) {
+                        for (Object object : jsonArray) {
+                            list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
+                        }
+                    }
+                }
             }
         }).start();
+    }
 
+    public static void updateUser(Context context) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //获取用户信息
+                if (isLogin) {
+                    MyResponse<User> result = null;
+                    try {
+                        result = JSON.parseObject(Http.getUserInfo(context, localUser.getPhone()), (Type) MyResponse.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (result.getStatus() == 0) {
+                        localUser = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
+                        local_editor.putString("localUser", JSON.toJSONString(localUser));
+                        local_editor.apply();
+                        localArticle = new ArrayList<Article>(Arrays.asList(localUser.getArticles()));
+                        localFocus = new ArrayList<User>(Arrays.asList(localUser.getFocus()));
+                        localFollower = new ArrayList<User>(Arrays.asList(localUser.getFollowers()));
+                    }
+                }
+            }
+        }).start();
     }
 
     public static void setTabHost(FragmentTabHost fragmentTabHost, Context context, FragmentManager fragmentManager) {
@@ -116,4 +129,5 @@ public class MyApplication extends Application {
     public static void setCurrentTab(int number) {
         tabHost.setCurrentTab(number);
     }
+
 }

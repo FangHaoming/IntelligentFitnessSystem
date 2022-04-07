@@ -1,39 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@color/bar"
-        android:layout_height="50dp">
+        android:layout_height="50dp"
+        android:background="@color/bar">
+
         <TextView
+            android:id="@+id/back"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginHorizontal="10dp"
             android:background="@drawable/back_arrow"
-            android:id="@+id/back"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/bar_release_article"
+            android:textColor="@color/text_normal"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="20sp"
-            android:textColor="@color/text_normal"
-            android:text="@string/bar_release_article"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/releaseBtn"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/btn_enable"
+            android:text="@string/release"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="@color/text_normal"
+            app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
+    <EditText
         android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:background="@color/text_normal"/>
+        android:layout_height="150dp"
+        android:gravity="start"
+        android:padding="20dp"
+        android:background="@color/white"
+        android:hint="@string/hint_input"
+        android:id="@+id/content_text"/>
+    <LinearLayout
+        android:id="@+id/content_images"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <ImageView
+            android:id="@+id/image_0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="2dp"
+            android:layout_weight="1"
+            android:src="@drawable/img_preview"
+            android:contentDescription="@string/nothing" />
+        <ImageView
+            android:id="@+id/image_1"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="2dp"
+            android:layout_weight="1"
+            android:src="@drawable/user_img"
+            android:contentDescription="@string/nothing"/>
+
+        <ImageView
+            android:id="@+id/image_2"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="2dp"
+            android:layout_weight="1"
+            android:src="@drawable/user_img"
+            android:contentDescription="@string/nothing"/>
+    </LinearLayout>
+    <com.yzs.imageshowpickerview.ImageShowPickerView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/picker"
+        app:pic_size="100dp"
+        app:add_label="@drawable/add_photo"
+        app:del_label="@drawable/delete"
+        app:is_show_del="true"
+        app:one_line_show_num="3"/>
+
 
 </LinearLayout>

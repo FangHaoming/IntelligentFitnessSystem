@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingVertical="20dp"
+                android:paddingVertical="10dp"
                 android:paddingHorizontal="10dp"
                 android:orientation="horizontal">
 
@@ -111,9 +111,11 @@
                 android:id="@+id/content_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
+                android:paddingBottom="20dp"
+                android:paddingHorizontal="10dp"
+                android:text="asdgasdg"
                 android:textColor="@color/text_selected"
-                android:textSize="16sp" />
+                android:textSize="20sp" />
 
             <LinearLayout
                 android:id="@+id/content_images"
@@ -227,6 +229,7 @@
             android:focusableInTouchMode="true"
             android:layout_weight="1"
             android:padding="5dp"
+            android:maxLength="100"
             android:background="@drawable/oval"
             android:hint="@string/hint_comment" />
 
