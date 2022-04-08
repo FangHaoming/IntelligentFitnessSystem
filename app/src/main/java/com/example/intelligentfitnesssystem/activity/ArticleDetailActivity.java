@@ -69,7 +69,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (result.getStatus() == 0) {
+                if (result != null && result.getStatus() == 0) {
                     article = JSON.parseObject(JSON.toJSONString(result.getData()), Article.class);
                     JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("comments");
                     if (jsonArray != null) {
@@ -127,7 +127,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
                         public void run() {
                             try {
                                 MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(ArticleDetailActivity.this, article.getId()), (Type) MyResponse.class);
-                                if (result.getStatus() == 0) {
+                                if (result != null && result.getStatus() == 0) {
                                     binding.praise.setBackground(ContextCompat.getDrawable(ArticleDetailActivity.this, R.drawable.praise));
                                     article.setLikeCount(article.getLikeCount() - 1);
                                     binding.praiseNum.setText(String.valueOf(article.getLikeCount()));
@@ -144,7 +144,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
                         public void run() {
                             try {
                                 MyResponse<Object> result = JSON.parseObject(Http.praiseComment(ArticleDetailActivity.this, article.getId()), (Type) MyResponse.class);
-                                if (result.getStatus() == 0) {
+                                if (result != null && result.getStatus() == 0) {
                                     binding.praise.setBackground(ContextCompat.getDrawable(ArticleDetailActivity.this, R.drawable.praise_clicked));
                                     article.setLikeCount(article.getLikeCount() + 1);
                                     binding.praiseNum.setText(String.valueOf(article.getLikeCount()));

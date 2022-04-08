@@ -127,7 +127,7 @@ public class ModifyInfoActivity extends AppCompatActivity {
                             try {
                                 System.out.println("******modify req:" + JSON.toJSONString(user));
                                 result = JSON.parseObject(Http.modifyUser(ModifyInfoActivity.this, user), (Type) MyResponse.class);
-                                if (result.getStatus() == 0) {
+                                if (result != null && result.getStatus() == 0) {
                                     User user_res = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
                                     localUser.setNickname(user_res.getNickname());
                                     localUser.setGender(user_res.getGender());

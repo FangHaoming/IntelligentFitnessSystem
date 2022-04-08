@@ -111,7 +111,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             public void run() {
                                 try {
                                     MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
-                                    if (result.getStatus() == 0) {
+                                    if (result != null && result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
                                         list.get(position).setLikeCount(list.get(position).getLikeCount() - 1);
                                         ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
@@ -128,7 +128,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             public void run() {
                                 try {
                                     MyResponse<Object> result = JSON.parseObject(Http.praiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
-                                    if (result.getStatus() == 0) {
+                                    if (result != null && result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
                                         list.get(position).setLikeCount(list.get(position).getLikeCount() + 1);
                                         ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));

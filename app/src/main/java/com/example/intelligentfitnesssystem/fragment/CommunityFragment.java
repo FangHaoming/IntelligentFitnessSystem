@@ -115,11 +115,11 @@ public class CommunityFragment extends Fragment {
         binding.releaseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isLogin) {
-                    Intent intent = new Intent(getContext(), LoginActivity.class);
-                    startActivity(intent);
-                    return;
-                }
+//                if (!isLogin) {
+//                    Intent intent = new Intent(getContext(), LoginActivity.class);
+//                    startActivity(intent);
+//                    return;
+//                }
                 Intent intent = new Intent(getContext(), ReleaseArticleActivity.class);
                 startActivity(intent);
             }
@@ -179,7 +179,7 @@ public class CommunityFragment extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (result.getStatus() == 0) {
+                if (result != null && result.getStatus() == 0) {
                     JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
                     if (jsonArray != null) {
                         for (Object object : jsonArray) {
@@ -234,11 +234,11 @@ public class CommunityFragment extends Fragment {
             public void run() {
                 MyResponse<ArticleList> result = null;
                 try {
-                    result = JSON.parseObject(Http.getArticleList(getContext(), type, 1, 10), (Type) MyResponse.class);
+                    result = JSON.parseObject(Http.getArticleList(requireContext(), type, 1, 10), (Type) MyResponse.class);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (result.getStatus() == 0) {
+                if (result != null && result.getStatus() == 0) {
                     JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
                     list.clear();
                     if (jsonArray != null) {

@@ -15,13 +15,6 @@ public class ImageBean extends ImageShowPickerBean {
         this.resId = resId;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public int getResId() {
-        return resId;
-    }
 
     @Override
     public String setImageShowPickerUrl() {

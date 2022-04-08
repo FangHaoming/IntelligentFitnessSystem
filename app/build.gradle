@@ -34,10 +34,11 @@ android {
 }
 
 dependencies {
+    implementation project(':matisse')
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
     implementation 'com.yanzhenjie:permission:1.0.7'
-    implementation 'com.zhihu.android:matisse:0.5.3-beta3'
+//    implementation 'com.zhihu.android:matisse:0.5.3-beta3'
     implementation 'com.github.yaozs:ImageShowPicker:1.0.1'
     implementation 'cn.ittiger:TigerVideoPlayer:1.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'

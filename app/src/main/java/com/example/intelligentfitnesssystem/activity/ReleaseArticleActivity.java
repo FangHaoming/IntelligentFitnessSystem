@@ -17,14 +17,13 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.alibaba.fastjson.JSON;
 import com.example.intelligentfitnesssystem.MainActivity;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.ImageBean;
 import com.example.intelligentfitnesssystem.databinding.ActivityReleaseArticleBinding;
 import com.example.intelligentfitnesssystem.util.GlideV4ImageEngine;
 import com.example.intelligentfitnesssystem.util.Loader;
-import com.example.intelligentfitnesssystem.widget.SetPermissionDialog;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.yanzhenjie.alertdialog.AlertDialog;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.PermissionNo;
@@ -35,8 +34,6 @@ import com.yzs.imageshowpickerview.ImageShowPickerBean;
 import com.yzs.imageshowpickerview.ImageShowPickerListener;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.GlideEngine;
-import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,8 +112,10 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        System.out.println("*****real data:"+ JSON.toJSONString(data));
         if (requestCode == 233 && resultCode == RESULT_OK && data != null) {
             List<Uri> uriList = Matisse.obtainResult(data);
+            System.out.println("*****real uriList:"+ JSON.toJSONString(uriList));
             if (uriList.size() == 1) {
                 binding.picker.addData(new ImageBean(getRealFilePath(ReleaseArticleActivity.this, uriList.get(0))));
             } else {
@@ -154,6 +153,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     };
 
     public String getRealFilePath(final Context context, final Uri uri) {
+        System.out.println("*****real uri:"+ JSON.toJSONString(uri));
         if (null == uri) return null;
         final String scheme = uri.getScheme();
         String data = null;
@@ -173,6 +173,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
                 cursor.close();
             }
         }
+        System.out.println("*****realPath:"+ JSON.toJSONString(data));
         return data;
     }
 }

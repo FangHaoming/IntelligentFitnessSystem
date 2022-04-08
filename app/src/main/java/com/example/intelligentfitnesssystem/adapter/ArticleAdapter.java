@@ -96,7 +96,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     public void run() {
                                         try {
                                             MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
-                                            if (result.getStatus() == 0) {
+                                            if (result != null && result.getStatus() == 0) {
                                                 ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
 
                                             } else {
@@ -115,8 +115,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     public void run() {
                                         try {
                                             MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
-                                            if (result.getStatus() == 0) {
-                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus)); } else {
+                                            if (result != null && result.getStatus() == 0) {
+                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
+                                            } else {
                                                 Looper.prepare();
                                                 Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
                                                 Looper.loop();
@@ -154,7 +155,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
             int[] temp = list.get(position).getLikeId();
             sort(temp);
-             isPraise = -1 != binarySearch(temp, localUser.getId());
+            isPraise = -1 != binarySearch(temp, localUser.getId());
             if (isPraise) {
                 ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
             }
@@ -168,7 +169,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             public void run() {
                                 try {
                                     MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
-                                    if (result.getStatus() == 0) {
+                                    if (result != null && result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
                                         list.get(position).setLikeCount(list.get(position).getLikeCount() - 1);
                                         ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
@@ -186,7 +187,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             public void run() {
                                 try {
                                     MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
-                                    if (result.getStatus() == 0) {
+                                    if (result != null && result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
                                         list.get(position).setLikeCount(list.get(position).getLikeCount() + 1);
                                         ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));

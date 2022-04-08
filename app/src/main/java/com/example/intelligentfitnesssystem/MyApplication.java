@@ -84,7 +84,7 @@ public class MyApplication extends Application {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (result.getStatus() == 0) {
+                if (result != null && result.getStatus() == 0) {
                     JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
                     if (jsonArray != null) {
                         for (Object object : jsonArray) {
@@ -108,7 +108,7 @@ public class MyApplication extends Application {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    if (result.getStatus() == 0) {
+                    if (result != null &&result.getStatus() == 0) {
                         localUser = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
                         local_editor.putString("localUser", JSON.toJSONString(localUser));
                         local_editor.apply();

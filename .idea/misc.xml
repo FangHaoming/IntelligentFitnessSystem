@@ -31,6 +31,15 @@
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_fragment_mine.xml" value="0.33" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_fragment_practice.xml" value="0.30027173913043476" />
         <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/layout/layout_main.xml" value="0.2598958333333333" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/app/src/main/res/xml/filepaths.xml" value="0.26268115942028986" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/activity_matisse.xml" value="0.26268115942028986" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/activity_media_preview.xml" value="0.25729166666666664" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/album_list_item.xml" value="0.25729166666666664" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/fragment_media_selection.xml" value="0.25729166666666664" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/fragment_preview_item.xml" value="0.25729166666666664" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/media_grid_content.xml" value="0.25729166666666664" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/media_grid_item.xml" value="0.25729166666666664" />
+        <entry key="..\:/CODE/IntelligentFitnessSystem/matisse/src/main/res/layout/photo_capture_item.xml" value="0.25729166666666664" />
       </map>
     </option>
   </component>
