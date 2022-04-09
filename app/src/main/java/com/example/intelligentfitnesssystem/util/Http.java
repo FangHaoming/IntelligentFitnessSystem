@@ -39,7 +39,7 @@ public class Http {
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(jsonObject), TYPE);
-        System.out.println("****register request "+JSON.toJSONString(user));
+        System.out.println("****register request " + JSON.toJSONString(user));
         Request request = new Request.Builder()
                 .url(path)
                 .post(requestBody)
@@ -47,7 +47,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -68,7 +68,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -86,7 +86,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -104,17 +104,18 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
     }
 
-    public static String modifyUser(Context context, User user) throws IOException {
+    public static String modifyUser(Context context, User user, byte[] imgData) throws IOException {
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
         String url = path + "/" + localUser.getId();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
+        jsonObject.put("imgData", imgData);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(jsonObject), TYPE);
         Request request = new Request.Builder()
@@ -125,7 +126,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -144,7 +145,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -163,7 +164,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -180,7 +181,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -197,7 +198,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -214,7 +215,24 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
+    }
+
+    public static String getUserInfo(Context context, int userId) throws IOException {
+        String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
+        String url = path + "/id/" + userId;
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("token", local_sp.getString("token", ""))
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        Response response = call.execute();
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -233,11 +251,12 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
     }
+
     public static String cancelPraiseArticle(Context context, int articleId) throws IOException {
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
         String url = path + "/" + articleId + "/dislike/" + localUser.getId();
@@ -251,7 +270,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -270,7 +289,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);
@@ -289,7 +308,7 @@ public class Http {
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         Response response = call.execute();
-        if(response.isSuccessful()){
+        if (response.isSuccessful()) {
             return Objects.requireNonNull(response.body()).string();
         }
         return context.getResources().getString(R.string.status_server_error);

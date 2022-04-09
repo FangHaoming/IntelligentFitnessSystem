@@ -1,5 +1,6 @@
 package com.example.intelligentfitnesssystem.adapter;
 
+import static com.example.intelligentfitnesssystem.MyApplication.commentId;
 import static com.example.intelligentfitnesssystem.MyApplication.localUser;
 import static java.util.Arrays.binarySearch;
 import static java.util.Arrays.sort;
@@ -26,6 +27,8 @@ import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.activity.ArticleDetailActivity;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
 import com.example.intelligentfitnesssystem.activity.ReleaseArticleActivity;
+import com.example.intelligentfitnesssystem.activity.SearchActivity;
+import com.example.intelligentfitnesssystem.activity.UserInfoActivity;
 import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
@@ -70,22 +73,44 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
-            System.out.println("*****list size:" + list.size());
-            if (list.get(position).getPublisherImg() != null) {
-                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + list.get(position).getPublisherImg()).into(((ListViewHolder) holder).head);
+            int safePosition = holder.getBindingAdapterPosition();
+            Article article = list.get(safePosition);
+            ListViewHolder listViewHolder = (ListViewHolder) holder;
+            if (article.getPublisherImg() != null) {
+                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + article.getPublisherImg()).into(listViewHolder.head);
             }
-            ((ListViewHolder) holder).nickname.setText(String.valueOf(list.get(position).getPublisherName()));
-            ((ListViewHolder) holder).createTime.setText(list.get(position).getCreateTime());
+            listViewHolder.head.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                MyResponse<User> result = JSON.parseObject(Http.getUserInfo(mContext, article.getUserId()), (Type) MyResponse.class);
+                                if (result.getStatus() == 0) {
+                                    Intent intent = new Intent(mContext, UserInfoActivity.class);
+                                    intent.putExtra("User", JSON.toJSONString(result.getData()));
+                                    mContext.startActivity(intent);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+            });
+            listViewHolder.nickname.setText(String.valueOf(article.getPublisherName()));
+            listViewHolder.createTime.setText(article.getCreateTime());
             for (User user : localUser.getFocus()) {
-                if (user.getId() == list.get(position).getUserId()) {
+                if (user.getId() == article.getUserId()) {
                     isFocus = true;
                     focusedUser = user;
                 }
             }
             if (isFocus) {
-                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
+                listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
             }
-            ((ListViewHolder) holder).focus.setOnClickListener(new View.OnClickListener() {
+            listViewHolder.focus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new Thread(new Runnable() {
@@ -96,9 +121,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     @Override
                                     public void run() {
                                         try {
-                                            MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
+                                            MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, article.getUserId()), (Type) MyResponse.class);
                                             if (result != null && result.getStatus() == 0) {
-                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focused));
+                                                listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
 
                                             } else {
                                                 Looper.prepare();
@@ -115,9 +140,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                     @Override
                                     public void run() {
                                         try {
-                                            MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, list.get(position).getUserId()), (Type) MyResponse.class);
+                                            MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, article.getUserId()), (Type) MyResponse.class);
                                             if (result != null && result.getStatus() == 0) {
-                                                ((ListViewHolder) holder).focus.setText(mContext.getResources().getString(R.string.focus));
+                                                listViewHolder.focus.setText(mContext.getResources().getString(R.string.focus));
                                             } else {
                                                 Looper.prepare();
                                                 Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
@@ -134,33 +159,36 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                 }
             });
-            ((ListViewHolder) holder).content_text.setText(list.get(position).getText());
-            if (list.get(position).getImg().length > 0 && !list.get(position).getImg()[0].split("\\.")[1].equals("mp4")) {
-                if (list.get(position).getImg()[0] != null) {
-                    ((ListViewHolder) holder).img_0.setVisibility(View.VISIBLE);
-                    ((ListViewHolder) holder).img_0.setImageResource(R.drawable.img_preview);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[0]).into(((ListViewHolder) holder).img_0);
+            if (article.getText() != null && !article.getText().equals("")) {
+                listViewHolder.content_text.setVisibility(View.VISIBLE);
+                listViewHolder.content_text.setText(article.getText());
+            }
+            if (article.getImg().length > 0 && !article.getImg()[0].split("\\.")[1].equals("mp4")) {
+                if (article.getImg()[0] != null) {
+                    listViewHolder.img_0.setVisibility(View.VISIBLE);
+                    listViewHolder.img_0.setImageResource(R.drawable.img_preview);
+                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0]).into(listViewHolder.img_0);
                 }
-                if (list.get(position).getImg().length > 1 && list.get(position).getImg()[1] != null) {
-                    ((ListViewHolder) holder).img_1.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[1]).into(((ListViewHolder) holder).img_1);
+                if (article.getImg().length > 1 && article.getImg()[1] != null) {
+                    listViewHolder.img_1.setVisibility(View.VISIBLE);
+                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[1]).into(listViewHolder.img_1);
                 }
-                if (list.get(position).getImg().length > 2 && list.get(position).getImg()[2] != null) {
-                    ((ListViewHolder) holder).img_2.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[2]).into(((ListViewHolder) holder).img_2);
+                if (article.getImg().length > 2 && article.getImg()[2] != null) {
+                    listViewHolder.img_2.setVisibility(View.VISIBLE);
+                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[2]).into(listViewHolder.img_2);
                 }
             }
-            if (list.get(position).getImg().length == 1 && list.get(position).getImg()[0].split("\\.")[1].equals("mp4")) {
-                ((ListViewHolder) holder).video.setVisibility(View.VISIBLE);
-                ((ListViewHolder) holder).video.bind(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + list.get(position).getImg()[0]);
+            if (article.getImg().length == 1 && article.getImg()[0].split("\\.")[1].equals("mp4")) {
+                listViewHolder.video.setVisibility(View.VISIBLE);
+                listViewHolder.video.bind(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0]);
             }
-            int[] temp = list.get(position).getLikeId();
+            int[] temp = article.getLikeId();
             sort(temp);
             isPraise = -1 != binarySearch(temp, localUser.getId());
             if (isPraise) {
-                ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
             }
-            ((ListViewHolder) holder).praise.setOnClickListener(new View.OnClickListener() {
+            listViewHolder.praise.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onClick(View v) {
@@ -169,11 +197,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             @Override
                             public void run() {
                                 try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
+                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, article.getId()), (Type) MyResponse.class);
                                     if (result != null && result.getStatus() == 0) {
-                                        ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
-                                        list.get(position).setLikeCount(list.get(position).getLikeCount() - 1);
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise));
+                                        article.setLikeCount(article.getLikeCount() - 1);
+                                        listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
                                         isPraise = false;
 
                                     }
@@ -187,11 +215,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             @Override
                             public void run() {
                                 try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, list.get(position).getId()), (Type) MyResponse.class);
+                                    MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, article.getId()), (Type) MyResponse.class);
                                     if (result != null && result.getStatus() == 0) {
-                                        ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
-                                        list.get(position).setLikeCount(list.get(position).getLikeCount() + 1);
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                                        article.setLikeCount(article.getLikeCount() + 1);
+                                        listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
                                         isPraise = true;
                                     }
                                 } catch (IOException e) {
@@ -202,20 +230,21 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     }
                 }
             });
-            ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
-            ((ListViewHolder) holder).comment.setOnClickListener(new View.OnClickListener() {
+            listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
+            listViewHolder.comment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class); //TODO 跳转到动态详情页
-                    intent.putExtra("Article", JSON.toJSONString(list.get(position)));
+                    Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);
+                    intent.putExtra("Article", JSON.toJSONString(article));
                     mContext.startActivity(intent);
                 }
             });
-            ((ListViewHolder) holder).comment_num.setText(String.valueOf(list.get(position).getCommentCount()));
-            ((ListViewHolder) holder).transport.setOnClickListener(new View.OnClickListener() {
+            listViewHolder.comment_num.setText(String.valueOf(article.getCommentCount()));
+            listViewHolder.transport.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext.getApplicationContext(), ReleaseArticleActivity.class); //TODO 跳转到发布动态页
+                    Intent intent = new Intent(mContext.getApplicationContext(), ReleaseArticleActivity.class);
+                    intent.putExtra("Article",JSON.toJSONString(article));
                     mContext.startActivity(intent);
                 }
             });

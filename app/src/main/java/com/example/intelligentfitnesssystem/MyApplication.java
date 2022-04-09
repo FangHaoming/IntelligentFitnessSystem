@@ -1,15 +1,19 @@
 package com.example.intelligentfitnesssystem;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTabHost;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.intelligentfitnesssystem.adapter.ArticleAdapter;
 import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.bean.ArticleList;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
@@ -75,7 +79,9 @@ public class MyApplication extends Application {
     }
 
     public static void getArticleList(Context context, String type, List<Article> list, int pageNum) {
+        System.out.println("*****getList "+list.size());
         new Thread(new Runnable() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void run() {
                 MyResponse<ArticleList> result = null;

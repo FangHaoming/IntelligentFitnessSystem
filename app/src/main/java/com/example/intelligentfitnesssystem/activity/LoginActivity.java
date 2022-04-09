@@ -122,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                 JSONObject data = (JSONObject) result.get("data");
                 switch (result.getInteger("status")) {
                     case 0:
+                        System.out.println("*****login res:"+JSON.toJSONString(data));
                         assert data != null;
                         if (binding.checkPwd.isChecked()) {
                             global_editor.putBoolean("isRemember", true);

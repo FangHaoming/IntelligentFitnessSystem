@@ -3,6 +3,7 @@ package com.example.intelligentfitnesssystem.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -111,11 +112,24 @@ public class MineFragment extends Fragment {
     }
 
     private void initView() {
+        System.out.println("*****user_img:" + localUser.getImg());
         if (isLogin) {
             if (localUser.getImg() != null && !localUser.getImg().equals("")) {
                 Glide.with(requireContext()).load(requireContext().getResources().getString(R.string.baseUrl) + requireContext().getResources().getString(R.string.api_get_img) + localUser.getImg()).into(binding.userImg);
             }
             binding.userName.setText(localUser.getNickname());
+            Drawable drawable = null;
+            if (localUser.getGender() != null) {
+                if (localUser.getGender().equals("女")) {
+                    drawable = ContextCompat.getDrawable(requireContext(), R.drawable.female);
+                } else if (localUser.getGender().equals("男")) {
+                    drawable = ContextCompat.getDrawable(requireContext(), R.drawable.male);
+                }
+            } else {
+                drawable = ContextCompat.getDrawable(requireContext(), R.drawable.unknown);
+            }
+            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+            binding.userName.setCompoundDrawables(null, null, drawable, null);
             binding.focusNum.setText(String.valueOf(localUser.getFocus().length));
             binding.followerNum.setText(String.valueOf(localUser.getFollowers().length));
         } else {

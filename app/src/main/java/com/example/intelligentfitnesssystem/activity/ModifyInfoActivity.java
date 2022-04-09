@@ -7,6 +7,9 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
@@ -18,11 +21,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSON;
+import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.MainActivity;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
 import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.databinding.ActivityModifyBinding;
+import com.example.intelligentfitnesssystem.util.AvatarStudio;
 import com.example.intelligentfitnesssystem.util.FileUtils;
 import com.example.intelligentfitnesssystem.util.Http;
 
@@ -32,6 +37,8 @@ import static com.example.intelligentfitnesssystem.MyApplication.isLogin;
 import static com.example.intelligentfitnesssystem.MyApplication.localUser;
 import static com.example.intelligentfitnesssystem.MyApplication.local_editor;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Calendar;
@@ -40,6 +47,7 @@ public class ModifyInfoActivity extends AppCompatActivity {
 
     private ActivityModifyBinding binding;
     private User user;
+    private byte[] imgData;
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -61,6 +69,32 @@ public class ModifyInfoActivity extends AppCompatActivity {
                 startActivity(intent);
                 overridePendingTransition(0, R.anim.slide_right_out);
                 finish();
+            }
+        });
+
+        if (localUser.getImg() != null) {
+            Glide.with(ModifyInfoActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + localUser.getImg()).into(binding.headImg);
+        }
+        binding.headImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AvatarStudio.Builder(ModifyInfoActivity.this)
+                        .needCrop(true)
+                        .setTextColor(Color.BLACK)
+                        .dimEnabled(true)
+                        .setAspect(1, 1)
+                        .setOutput(250, 250)
+                        .setText("打开相机", "从相册中选取", "取消")
+                        .show(new AvatarStudio.CallBack() {
+                            @Override
+                            public void callback(String uri) {
+                                System.out.println("*****uri:" + uri);
+                                if (uri != null && !uri.equals("")) {
+                                    user.setImg(uri.split("/")[uri.split("/").length-1]);
+                                    setAvataor(uri);
+                                }
+                            }
+                        });
             }
         });
 
@@ -125,10 +159,12 @@ public class ModifyInfoActivity extends AppCompatActivity {
                         public void run() {
                             MyResponse<User> result = null;
                             try {
-                                System.out.println("******modify req:" + JSON.toJSONString(user));
-                                result = JSON.parseObject(Http.modifyUser(ModifyInfoActivity.this, user), (Type) MyResponse.class);
+                                System.out.println("******modify req:" + JSON.toJSONString(imgData));
+                                result = JSON.parseObject(Http.modifyUser(ModifyInfoActivity.this, user, imgData), (Type) MyResponse.class);
                                 if (result != null && result.getStatus() == 0) {
                                     User user_res = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
+                                    System.out.println("******modify res:" + JSON.toJSONString(user_res));
+                                    localUser.setImg(user_res.getImg());
                                     localUser.setNickname(user_res.getNickname());
                                     localUser.setGender(user_res.getGender());
                                     localUser.setPwdHex(user_res.getPwdHex());
@@ -167,5 +203,27 @@ public class ModifyInfoActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void setAvataor(final String uri) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(uri));
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    imgData = out.toByteArray();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            binding.headImg.setImageBitmap(bitmap);
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

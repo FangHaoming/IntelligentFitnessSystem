@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,7 +62,7 @@ public class CommunityFragment extends Fragment {
     private ArticleAdapter articleAdapter;
     private TextView current;
     private String ArticleListType = "hot";
-    private int pageNum = 1;
+    private int pageNum = 2;
     private List<Article> list = new ArrayList<>();
 
     @Nullable
@@ -71,20 +72,8 @@ public class CommunityFragment extends Fragment {
         View view = binding.getRoot();
         initView();
         current = binding.chosen;
-        switch (ArticleListType) {
-            case "hot":
-                list = chosenArticleList;
-                list.clear();
-                break;
-            case "follow":
-                list = focusArticleList;
-                list.clear();
-                break;
-            case "newest":
-                list = latestArticleList;
-                list.clear();
-                break;
-        }
+        System.out.println("*****fragment create");
+
 
         articleAdapter = new ArticleAdapter(getContext(), chosenArticleList);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -98,19 +87,19 @@ public class CommunityFragment extends Fragment {
                     startActivity(intent);
                     return;
                 }
-                switchType(binding.focus, "follow", focusArticleList);
+                switchType(binding.focus, "follow");
             }
         });
         binding.chosen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchType(binding.chosen, "hot", chosenArticleList);
+                switchType(binding.chosen, "hot");
             }
         });
         binding.latest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchType(binding.latest, "newest", latestArticleList);
+                switchType(binding.latest, "newest");
             }
         });
         binding.head.setOnClickListener(new View.OnClickListener() {
@@ -150,7 +139,41 @@ public class CommunityFragment extends Fragment {
                 super.onScrolled(recyclerView, dx, dy);
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) binding.recyclerView.getLayoutManager();
                 if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == list.size() - 1) {
-                    loadMore();
+                    recyclerView.post(new Runnable() {
+                        @SuppressLint("NotifyDataSetChanged")
+                        @Override
+                        public void run() {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MyResponse<ArticleList> result = null;
+                                    try {
+                                        result = JSON.parseObject(Http.getArticleList(requireContext(), ArticleListType, pageNum, 10), (Type) MyResponse.class);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    if (result != null && result.getStatus() == 0) {
+                                        JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
+                                        if (jsonArray != null) {
+                                            if (jsonArray.size() != 0) {
+                                                pageNum++;
+                                                for (Object object : jsonArray) {
+                                                    list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
+                                                }
+                                            }
+                                        }
+                                        requireActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                articleAdapter.notifyDataSetChanged();
+                                            }
+                                        });
+                                    }
+                                    System.out.println("*****list size & pageNum:" + list.size() + " " + pageNum);
+                                }
+                            }).start();
+                        }
+                    });
                 }
             }
         });
@@ -177,7 +200,7 @@ public class CommunityFragment extends Fragment {
         initView();
         System.out.println("*****fragment Resume");
         System.out.println("*****resume type: " + ArticleListType);
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 MyResponse<ArticleList> result = null;
@@ -206,7 +229,7 @@ public class CommunityFragment extends Fragment {
                     }
                 });
             }
-        }).start();
+        }).start();*/
     }
 
 
@@ -228,13 +251,7 @@ public class CommunityFragment extends Fragment {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void loadMore() {
-        getArticleList(getContext(), ArticleListType, list, ++pageNum);
-        articleAdapter.notifyDataSetChanged();
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private void switchType(TextView tv, String type, List<Article> list) {
+    private void switchType(TextView tv, String type) {
         ArticleListType = type;
         current.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         current.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_normal));
@@ -253,6 +270,7 @@ public class CommunityFragment extends Fragment {
                 if (result != null && result.getStatus() == 0) {
                     JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
                     list.clear();
+                    pageNum = 2;
                     if (jsonArray != null) {
                         for (Object object : jsonArray) {
                             list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
@@ -272,7 +290,7 @@ public class CommunityFragment extends Fragment {
     }
 
     private void showBottomDialog() {
-        Dialog dialog = new Dialog(requireContext(), R.style.BottomDialog);
+        Dialog dialog = new Dialog(requireContext(), R.style.BottomDialog1);
         LinearLayout root = (LinearLayout) LayoutInflater.from(requireContext()).inflate(R.layout.bottom_dialog, null);
         View.OnClickListener listener = new View.OnClickListener() {
             @Override

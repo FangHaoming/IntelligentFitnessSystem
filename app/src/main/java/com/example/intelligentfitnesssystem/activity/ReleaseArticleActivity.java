@@ -3,6 +3,7 @@ package com.example.intelligentfitnesssystem.activity;
 import static com.example.intelligentfitnesssystem.MyApplication.isLogin;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -19,8 +21,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSON;
+import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.MainActivity;
 import com.example.intelligentfitnesssystem.R;
+import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.bean.ImageBean;
 import com.example.intelligentfitnesssystem.databinding.ActivityReleaseArticleBinding;
 import com.example.intelligentfitnesssystem.util.GlideV4ImageEngine;
@@ -46,7 +50,9 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     private ActivityReleaseArticleBinding binding;
     private List<ImageBean> list = new ArrayList<>();
     private View root;
+    private Article article = new Article();
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +60,6 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         root = binding.getRoot();
         setContentView(root);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
 
         binding.back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +83,22 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         } else {
             binding.picker.setMaxNum(0);
             binding.share.setVisibility(View.VISIBLE);
+            System.out.println("*****release rec article:" + getIntent().getStringExtra("Article"));
+
+            article = JSON.parseObject(getIntent().getStringExtra("Article"), Article.class);
+            if (article.getImg().length > 0 && !article.getImg()[0].split("\\.")[1].equals("mp4")) {
+                Glide.with(ReleaseArticleActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + getString(R.string.api_get_articleImg) + article.getImg()[0]).into(binding.shareImg);
+            } else if (article.getPublisherImg() != null) {
+                Glide.with(ReleaseArticleActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + article.getPublisherImg()).into(binding.shareImg);
+            }
+            if (article.getText() != null && !article.getText().equals("")) {
+                binding.shareContentText.setVisibility(View.VISIBLE);
+                binding.shareContentText.setText(article.getText());
+                binding.nickname.setText(article.getPublisherName());
+            } else {
+                binding.nickname.setText(article.getPublisherName() + "分享的动态");
+            }
+
         }
 
 
@@ -198,5 +219,15 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         }
         System.out.println("*****realPath:" + JSON.toJSONString(data));
         return data;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent intent = new Intent(ReleaseArticleActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        return true;
     }
 }

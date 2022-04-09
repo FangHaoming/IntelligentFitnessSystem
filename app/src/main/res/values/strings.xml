@@ -50,20 +50,32 @@
     <string name="click_to_login">点击此处登录</string>
     <string name="click_to_cancel">取消</string>
     <string name="click_to_search">搜索</string>
-    <string name="hint_phone">请填写手机号</string>
+    <string name="hint_phone" translatable="false">请填写手机号</string>
     <string name="hint_comment">留下精彩的评论吧</string>
     <string name="hint_nickname">请输入用户名</string>
     <string name="hint_confirm_pwd">再次输入密码</string>
-    <string name="hint_pwd">请输入密码</string>
+    <string name="hint_pwd" translatable="false">请输入密码</string>
     <string name="hint_pwd_diff">两次密码不一致</string>
     <string name="hint_birth">请选择日期</string>
     <string name="hint_practice">请选择动作类型</string>
     <string name="hint_input">请输入内容</string>
+    <string name="head_img">头像</string>
     <string name="male">男</string>
     <string name="female">女</string>
     <string name="info_error_server">服务器错误</string>
     <string name="info_success_login">登陆成功</string>
+    <string name="info_no_user">找不到用户</string>
     <string name="permission_request_denied">获取权限失败</string>
     <string name="nothing"> </string>
+
+    <string name="msg_no_camera">没有系统相机</string>
+    <string name="camera">拍照</string>
+    <string name="gallery">相册</string>
+    <string name="cancel">取消</string>
+
+    <string name="mis_permission_dialog_title">权限拒绝</string>
+    <string name="mis_permission_dialog_ok">好</string>
+    <string name="mis_permission_dialog_cancel">拒绝</string>
+    <string name="mis_permission_rationale_write_storage">需要您提供写/读存储权限</string>
 
 </resources>

@@ -88,14 +88,16 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
-            if (list.get(position).getPublisherImg() != null) {
-                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + list.get(position).getPublisherImg()).into(((ListViewHolder) holder).head);
+            int safePosition = holder.getBindingAdapterPosition();
+            Comment comment = list.get(safePosition);
+            if (comment.getPublisherImg() != null) {
+                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + comment.getPublisherImg()).into(((ListViewHolder) holder).head);
             }
-            ((ListViewHolder) holder).nickname.setText(String.valueOf(list.get(position).getPublisherName()));
-            ((ListViewHolder) holder).createTime.setText(list.get(position).getCreateTime());
-            ((ListViewHolder) holder).content_text.setText(list.get(position).getContent());
+            ((ListViewHolder) holder).nickname.setText(String.valueOf(comment.getPublisherName()));
+            ((ListViewHolder) holder).createTime.setText(comment.getCreateTime());
+            ((ListViewHolder) holder).content_text.setText(comment.getContent());
 
-            int[] temp = list.get(position).getLikeId();
+            int[] temp = comment.getLikeId();
             sort(temp);
             final boolean[] isPraise = {-1 != binarySearch(temp, localUser.getId())};
             if (isPraise[0]) {
@@ -110,11 +112,11 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             @Override
                             public void run() {
                                 try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
+                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(mContext, comment.getId()), (Type) MyResponse.class);
                                     if (result != null && result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
-                                        list.get(position).setLikeCount(list.get(position).getLikeCount() - 1);
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        comment.setLikeCount(comment.getLikeCount() - 1);
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(comment.getLikeCount()));
                                         isPraise[0] = false;
                                     }
                                 } catch (IOException e) {
@@ -127,11 +129,11 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             @Override
                             public void run() {
                                 try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.praiseComment(mContext, list.get(position).getId()), (Type) MyResponse.class);
+                                    MyResponse<Object> result = JSON.parseObject(Http.praiseComment(mContext, comment.getId()), (Type) MyResponse.class);
                                     if (result != null && result.getStatus() == 0) {
                                         ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
-                                        list.get(position).setLikeCount(list.get(position).getLikeCount() + 1);
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+                                        comment.setLikeCount(comment.getLikeCount() + 1);
+                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(comment.getLikeCount()));
                                         isPraise[0] = true;
                                     }
                                 } catch (IOException e) {
@@ -142,7 +144,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     }
                 }
             });
-            ((ListViewHolder) holder).praise_num.setText(String.valueOf(list.get(position).getLikeCount()));
+            ((ListViewHolder) holder).praise_num.setText(String.valueOf(comment.getLikeCount()));
 
             if (!isShowCommentBtn) ((ListViewHolder) holder).comment.setVisibility(View.GONE);
             ((ListViewHolder) holder).comment.setOnClickListener(new View.OnClickListener() {
@@ -150,15 +152,15 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 public void onClick(View v) {
                     if (et != null) {
                         et.requestFocus();
-                        commentId = list.get(position).getId();
+                        commentId = comment.getId();
                         System.out.println("*****commentId:" + commentId);
                         InputMethodManager inputMethodManager = (InputMethodManager) et.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                         inputMethodManager.showSoftInput(et, 0);
                     }
                 }
             });
-            if (list.get(position).getCommentCount() > 0) {
-                ((ListViewHolder) holder).comment_num.setText("查看全部" + list.get(position).getCommentCount() + "条回复");
+            if (comment.getCommentCount() > 0) {
+                ((ListViewHolder) holder).comment_num.setText("查看全部" + comment.getCommentCount() + "条回复");
             }
 
         }

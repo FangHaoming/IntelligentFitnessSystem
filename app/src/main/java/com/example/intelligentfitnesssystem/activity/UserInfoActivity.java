@@ -3,6 +3,7 @@ package com.example.intelligentfitnesssystem.activity;
 import static com.example.intelligentfitnesssystem.MyApplication.localUser;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.TypedValue;
@@ -36,13 +37,7 @@ public class UserInfoActivity extends AppCompatActivity {
         current = binding.articleBtn;
         user = JSON.parseObject(getIntent().getStringExtra("User"), User.class);
         binding.bar.setVisibility(View.VISIBLE);
-        binding.modify.setText("");
-        if(user.getBirth()!=null){
-            binding.modify.setText(user.getBirth());
-        }
-        if(user.getGender()!=null){
-            binding.modify.setText(binding.modify.getText().toString().trim().equals("")? user.getGender(): binding.modify.getText().toString().trim()+" "+user.getGender());
-        }
+        binding.modify.setVisibility(View.GONE);
 
         binding.back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,9 +71,22 @@ public class UserInfoActivity extends AppCompatActivity {
             Glide.with(this).load(getResources().getString(R.string.baseUrl) + getResources().getString(R.string.api_get_img) + user.getImg()).into(binding.userImg);
         }
         binding.userName.setText(user.getNickname());
+        Drawable drawable = null;
+        if (user.getGender() != null) {
+            if (user.getGender().equals("女")) {
+                drawable = ContextCompat.getDrawable(UserInfoActivity.this, R.drawable.female);
+            } else if (user.getGender().equals("男")) {
+                drawable = ContextCompat.getDrawable(UserInfoActivity.this, R.drawable.male);
+            }
+        } else {
+            drawable = ContextCompat.getDrawable(UserInfoActivity.this, R.drawable.unknown);
+        }
+        drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+        binding.userName.setCompoundDrawables(null, null, drawable, null);
         binding.focusNum.setText(String.valueOf(user.getFocus().length));
         binding.followerNum.setText(String.valueOf(user.getFollowers().length));
     }
+
     private void switchTab(TextView tv) {
         current.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         current.setTextColor(ContextCompat.getColor(this, R.color.text_normal));
