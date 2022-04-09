@@ -1,13 +1,18 @@
 package com.example.intelligentfitnesssystem.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -46,6 +51,8 @@ import static com.example.intelligentfitnesssystem.MyApplication.isLogin;
 import static com.example.intelligentfitnesssystem.MyApplication.latestArticleList;
 import static com.example.intelligentfitnesssystem.MyApplication.localUser;
 import static com.example.intelligentfitnesssystem.MyApplication.setCurrentTab;
+
+import cn.ittiger.player.PlayerManager;
 
 
 public class CommunityFragment extends Fragment {
@@ -115,13 +122,13 @@ public class CommunityFragment extends Fragment {
         binding.releaseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (!isLogin) {
-//                    Intent intent = new Intent(getContext(), LoginActivity.class);
-//                    startActivity(intent);
-//                    return;
-//                }
-                Intent intent = new Intent(getContext(), ReleaseArticleActivity.class);
-                startActivity(intent);
+
+                if (!isLogin) {
+                    Intent intent = new Intent(getContext(), LoginActivity.class);
+                    startActivity(intent);
+                    return;
+                }
+                showBottomDialog();
             }
         });
         binding.search.setOnClickListener(new View.OnClickListener() {
@@ -191,7 +198,11 @@ public class CommunityFragment extends Fragment {
                     @Override
                     public void run() {
                         articleAdapter.setList(list);
-                        binding.recyclerView.setAdapter(articleAdapter);
+                        if (binding != null && articleAdapter != null) {
+                            binding.recyclerView.getRecycledViewPool().clear();
+                            binding.recyclerView.setAdapter(articleAdapter);
+                        }
+
                     }
                 });
             }
@@ -203,6 +214,7 @@ public class CommunityFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         System.out.println("*****fragment destroy");
+        PlayerManager.getInstance().stop();
         binding = null;
     }
 
@@ -251,10 +263,54 @@ public class CommunityFragment extends Fragment {
                     @Override
                     public void run() {
                         articleAdapter.setList(list);
+                        binding.recyclerView.getRecycledViewPool().clear();
                         binding.recyclerView.setAdapter(articleAdapter);
                     }
                 });
             }
         }).start();
+    }
+
+    private void showBottomDialog() {
+        Dialog dialog = new Dialog(requireContext(), R.style.BottomDialog);
+        LinearLayout root = (LinearLayout) LayoutInflater.from(requireContext()).inflate(R.layout.bottom_dialog, null);
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), ReleaseArticleActivity.class);
+                switch (v.getId()) {
+                    case R.id.btn_choose_img:
+                        dialog.hide();
+                        intent.putExtra("type", "photo");
+                        startActivity(intent);
+                        break;
+                    case R.id.btn_choose_video:
+                        dialog.hide();
+                        intent.putExtra("type", "video");
+                        startActivity(intent);
+                        break;
+                    case R.id.btn_cancel:
+                        dialog.hide();
+                        break;
+                }
+            }
+        };
+        root.findViewById(R.id.btn_choose_img).setOnClickListener(listener);
+        root.findViewById(R.id.btn_choose_video).setOnClickListener(listener);
+        root.findViewById(R.id.btn_cancel).setOnClickListener(listener);
+        dialog.setContentView(root);
+        Window dialogWindow = dialog.getWindow();
+        dialogWindow.setGravity(Gravity.BOTTOM);
+//        dialogWindow.setWindowAnimations(R.style.dialogstyle); // 添加动画
+        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+        lp.x = 0;
+        lp.y = 0;
+        lp.width = (int) getResources().getDisplayMetrics().widthPixels;
+        root.measure(0, 0);
+        lp.height = root.getMeasuredHeight();
+
+        lp.alpha = 9f;
+        dialogWindow.setAttributes(lp);
+        dialog.show();
     }
 }

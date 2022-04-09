@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -62,45 +63,51 @@
         android:hint="@string/hint_input"
         android:id="@+id/content_text"/>
     <LinearLayout
-        android:id="@+id/content_images"
         android:layout_width="match_parent"
-        android:layout_height="100dp">
-
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:background="@color/share_background"
+        android:layout_marginHorizontal="10dp"
+        android:visibility="gone"
+        android:id="@+id/share">
         <ImageView
-            android:id="@+id/image_0"
-            android:layout_width="match_parent"
+            android:layout_width="110dp"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="2dp"
-            android:layout_weight="1"
-            android:src="@drawable/img_preview"
-            android:contentDescription="@string/nothing" />
-        <ImageView
-            android:id="@+id/image_1"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="2dp"
-            android:layout_weight="1"
+            android:id="@+id/share_img"
             android:src="@drawable/user_img"
-            android:contentDescription="@string/nothing"/>
-
-        <ImageView
-            android:id="@+id/image_2"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="2dp"
-            android:layout_weight="1"
-            android:src="@drawable/user_img"
-            android:contentDescription="@string/nothing"/>
+            android:background="@color/white"
+            android:paddingEnd="10dp"
+            tools:ignore="RtlSymmetry" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/text_selected"
+                android:id="@+id/nickname"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/text_normal"
+                android:visibility="gone"
+                android:id="@+id/share_content_text"/>
+        </LinearLayout>
     </LinearLayout>
     <com.yzs.imageshowpickerview.ImageShowPickerView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="20dp"
         android:id="@+id/picker"
         app:pic_size="100dp"
         app:add_label="@drawable/add_photo"
-        app:del_label="@drawable/delete"
         app:is_show_del="true"
         app:one_line_show_num="3"/>
 

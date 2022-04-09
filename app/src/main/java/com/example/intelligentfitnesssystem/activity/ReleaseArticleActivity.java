@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -44,13 +45,14 @@ public class ReleaseArticleActivity extends AppCompatActivity {
 
     private ActivityReleaseArticleBinding binding;
     private List<ImageBean> list = new ArrayList<>();
+    private View root;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityReleaseArticleBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
-        setContentView(view);
+        root = binding.getRoot();
+        setContentView(root);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
 
@@ -66,18 +68,31 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         binding.picker.setImageLoaderInterface(new Loader());
         binding.picker.setNewData(list);
         binding.picker.setShowAnim(false);
+        if (getIntent().getStringExtra("type") != null) {
+            if (getIntent().getStringExtra("type").equals("photo")) {
+                binding.picker.setMaxNum(9);
+            }
+            if (getIntent().getStringExtra("type").equals("video")) {
+                binding.picker.setMaxNum(1);
+            }
+        } else {
+            binding.picker.setMaxNum(0);
+            binding.share.setVisibility(View.VISIBLE);
+        }
+
+
         binding.picker.setPickerListener(new ImageShowPickerListener() {
             @Override
             public void addOnClickListener(int remainNum) {
                 Matisse.from(ReleaseArticleActivity.this)
-                        .choose(MimeType.ofAll())
+                        .choose(getIntent().getStringExtra("type") != null && getIntent().getStringExtra("type").equals("photo") ? MimeType.ofImage() : MimeType.ofVideo())
                         .showSingleMediaType(true)
                         .countable(true)
-                        .maxSelectablePerMediaType(9,1)
-                        .gridExpectedSize(1)
+                        .maxSelectable(remainNum + 1)
                         .imageEngine(new GlideV4ImageEngine())
                         .forResult(233);
             }
+
 
             @Override
             public void picOnClickListener(List<ImageShowPickerBean> list, int position, int remainNum) {
@@ -90,6 +105,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
             }
         });
         binding.picker.show();
+
         AndPermission.with(ReleaseArticleActivity.this)
                 .requestCode(300)
                 .permission(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -97,6 +113,13 @@ public class ReleaseArticleActivity extends AppCompatActivity {
                 .callback(ReleaseArticleActivity.this)
                 .start();
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        InputMethodManager inputMethodManager = (InputMethodManager) binding.contentText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(root.getWindowToken(), 0);
     }
 
     @PermissionYes(300)
@@ -112,10 +135,10 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("*****real data:"+ JSON.toJSONString(data));
+        System.out.println("*****real data:" + JSON.toJSONString(data));
         if (requestCode == 233 && resultCode == RESULT_OK && data != null) {
             List<Uri> uriList = Matisse.obtainResult(data);
-            System.out.println("*****real uriList:"+ JSON.toJSONString(uriList));
+            System.out.println("*****real uriList:" + JSON.toJSONString(uriList));
             if (uriList.size() == 1) {
                 binding.picker.addData(new ImageBean(getRealFilePath(ReleaseArticleActivity.this, uriList.get(0))));
             } else {
@@ -153,7 +176,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     };
 
     public String getRealFilePath(final Context context, final Uri uri) {
-        System.out.println("*****real uri:"+ JSON.toJSONString(uri));
+        System.out.println("*****real uri:" + JSON.toJSONString(uri));
         if (null == uri) return null;
         final String scheme = uri.getScheme();
         String data = null;
@@ -173,7 +196,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
                 cursor.close();
             }
         }
-        System.out.println("*****realPath:"+ JSON.toJSONString(data));
+        System.out.println("*****realPath:" + JSON.toJSONString(data));
         return data;
     }
 }
