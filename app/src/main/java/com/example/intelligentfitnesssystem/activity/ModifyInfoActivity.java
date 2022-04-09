@@ -2,9 +2,11 @@ package com.example.intelligentfitnesssystem.activity;
 
 import static android.app.AlertDialog.THEME_HOLO_LIGHT;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -30,6 +32,9 @@ import com.example.intelligentfitnesssystem.databinding.ActivityModifyBinding;
 import com.example.intelligentfitnesssystem.util.AvatarStudio;
 import com.example.intelligentfitnesssystem.util.FileUtils;
 import com.example.intelligentfitnesssystem.util.Http;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.Rationale;
+import com.yanzhenjie.permission.RationaleListener;
 
 import static com.example.intelligentfitnesssystem.MyApplication.global_editor;
 import static com.example.intelligentfitnesssystem.MyApplication.initApp;
@@ -62,6 +67,13 @@ public class ModifyInfoActivity extends AppCompatActivity {
         binding.name.setText(localUser.getNickname());
         binding.birth.setText(localUser.getBirth());
 
+        AndPermission.with(ModifyInfoActivity.this)
+                .requestCode(300)
+                .permission(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .rationale(rationaleListener)
+                .callback(ModifyInfoActivity.this)
+                .start();
+
         binding.back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +102,7 @@ public class ModifyInfoActivity extends AppCompatActivity {
                             public void callback(String uri) {
                                 System.out.println("*****uri:" + uri);
                                 if (uri != null && !uri.equals("")) {
-                                    user.setImg(uri.split("/")[uri.split("/").length-1]);
+                                    user.setImg(uri.split("/")[uri.split("/").length - 1]);
                                     setAvataor(uri);
                                 }
                             }
@@ -147,6 +159,9 @@ public class ModifyInfoActivity extends AppCompatActivity {
                 user.setNickname(binding.name.getText().toString().trim());
                 user.setBirth(binding.birth.getText().toString().trim());
                 user.setPhone(localUser.getPhone());
+                if (user.getGender() == null || user.getGender().equals("")) {
+                    user.setGender(localUser.getGender());
+                }
                 if (binding.pwd.getText().toString().trim().equals(binding.confirmPwd.getText().toString().trim())) {
                     if (!binding.pwd.getText().toString().trim().equals("")) {
                         user.setPwdHex(FileUtils.sha1String(binding.pwd.getText().toString()));
@@ -226,4 +241,27 @@ public class ModifyInfoActivity extends AppCompatActivity {
             }
         }).start();
     }
+
+    private RationaleListener rationaleListener = new RationaleListener() {
+        @Override
+        public void showRequestPermissionRationale(int i, final Rationale rationale) {
+            com.yanzhenjie.alertdialog.AlertDialog.newBuilder(ModifyInfoActivity.this)
+                    .setTitle("请求权限")
+                    .setMessage("请求权限")
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            rationale.resume();
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            rationale.cancel();
+                        }
+                    }).show();
+        }
+    };
 }

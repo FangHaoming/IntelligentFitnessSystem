@@ -1,7 +1,5 @@
 package com.example.intelligentfitnesssystem.activity;
 
-import static com.example.intelligentfitnesssystem.MyApplication.isLogin;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
@@ -15,7 +13,6 @@ import android.provider.MediaStore;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,8 +40,6 @@ import com.zhihu.matisse.MimeType;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.functions.Consumer;
-
 public class ReleaseArticleActivity extends AppCompatActivity {
 
     private ActivityReleaseArticleBinding binding;
@@ -65,6 +60,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ReleaseArticleActivity.this, MainActivity.class);
+                intent.putExtra("from","release");
                 startActivity(intent);
                 overridePendingTransition(0, R.anim.slide_right_out);
                 finish();
@@ -134,7 +130,31 @@ public class ReleaseArticleActivity extends AppCompatActivity {
                 .callback(ReleaseArticleActivity.this)
                 .start();
 
+
+
     }
+    private RationaleListener rationaleListener = new RationaleListener() {
+        @Override
+        public void showRequestPermissionRationale(int i, final Rationale rationale) {
+            AlertDialog.newBuilder(ReleaseArticleActivity.this)
+                    .setTitle("请求权限")
+                    .setMessage("请求权限")
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            rationale.resume();
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            rationale.cancel();
+                        }
+                    }).show();
+        }
+    };
 
     @Override
     protected void onPause() {
@@ -172,30 +192,6 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         }
     }
 
-    private RationaleListener rationaleListener = new RationaleListener() {
-        @Override
-        public void showRequestPermissionRationale(int i, final Rationale rationale) {
-            // 自定义对话框。
-            AlertDialog.newBuilder(ReleaseArticleActivity.this)
-                    .setTitle("请求权限")
-                    .setMessage("请求权限")
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                            rationale.resume();
-                        }
-                    })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                            rationale.cancel();
-                        }
-                    }).show();
-        }
-    };
-
     public String getRealFilePath(final Context context, final Uri uri) {
         System.out.println("*****real uri:" + JSON.toJSONString(uri));
         if (null == uri) return null;
@@ -225,6 +221,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             Intent intent = new Intent(ReleaseArticleActivity.this, MainActivity.class);
+            intent.putExtra("from","release");
             startActivity(intent);
             finish();
         }

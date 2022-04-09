@@ -198,38 +198,42 @@ public class CommunityFragment extends Fragment {
     public void onResume() {
         super.onResume();
         initView();
-        System.out.println("*****fragment Resume");
-        System.out.println("*****resume type: " + ArticleListType);
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                MyResponse<ArticleList> result = null;
-                try {
-                    result = JSON.parseObject(Http.getArticleList(requireContext(), ArticleListType, 1, 10), (Type) MyResponse.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (result != null && result.getStatus() == 0) {
-                    JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
-                    if (jsonArray != null) {
-                        for (Object object : jsonArray) {
-                            list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
+        if (requireActivity().getIntent().getStringExtra("from") == null || !requireActivity().getIntent().getStringExtra("from").equals("release")) {
+            System.out.println("*****fragment Resume");
+            System.out.println("*****resume type: " + ArticleListType);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    MyResponse<ArticleList> result = null;
+                    try {
+                        result = JSON.parseObject(Http.getArticleList(requireContext(), ArticleListType, 1, 10), (Type) MyResponse.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (result != null && result.getStatus() == 0) {
+                        list.clear();
+                        pageNum = 2;
+                        JSONArray jsonArray = (JSONArray) JSONObject.parseObject(JSON.toJSONString(result.getData())).get("articles");
+                        if (jsonArray != null) {
+                            for (Object object : jsonArray) {
+                                list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
+                            }
                         }
                     }
-                }
-                requireActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        articleAdapter.setList(list);
-                        if (binding != null && articleAdapter != null) {
-                            binding.recyclerView.getRecycledViewPool().clear();
-                            binding.recyclerView.setAdapter(articleAdapter);
-                        }
+                    requireActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            articleAdapter.setList(list);
+                            if (binding != null && articleAdapter != null) {
+                                binding.recyclerView.getRecycledViewPool().clear();
+                                binding.recyclerView.setAdapter(articleAdapter);
+                            }
 
-                    }
-                });
-            }
-        }).start();*/
+                        }
+                    });
+                }
+            }).start();
+        }
     }
 
 
@@ -247,7 +251,6 @@ public class CommunityFragment extends Fragment {
         } else {
             binding.head.setImageResource(R.drawable.user_img);
         }
-
     }
 
     @SuppressLint("NotifyDataSetChanged")
