@@ -49,9 +49,9 @@ public class PracticeFragment extends Fragment {
         binding = LayoutFragmentPracticeBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        String[] types = {"引体向上", "仰卧起坐", "俯卧撑"};
-        String[] types_En = {"pullup", "situpdown", "lieupdown"};
-        String[] types_Cl = {"#EAAB5D", "#BC885A", "#FA584C"};
+        String[] types = {"引体向上", "仰卧起坐", "俯卧撑","深蹲","平板支撑","箭步蹲","杠端臂屈伸","高抬腿"};
+        String[] types_En = {"pullup", "situp", "pushup","squat","plank","lunge","dips","highknees"};
+        String[] types_Cl = {"#EAAB5D", "#BC885A", "#FA584C","#7B5192","#924F45","#928A2C","#909211","#119278"};
         for (int i = 0; i < types.length; i++) {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             int padding = Tools.dip2px(getContext(), 20);

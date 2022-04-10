@@ -134,6 +134,7 @@ public class MineFragment extends Fragment {
             binding.followerNum.setText(String.valueOf(localUser.getFollowers().length));
         } else {
             binding.userImg.setImageResource(R.drawable.user_img);
+            binding.userName.setCompoundDrawables(null, null, null, null);
             binding.userName.setText(R.string.click_to_login);
             binding.focusNum.setText("-");
             binding.followerNum.setText("-");

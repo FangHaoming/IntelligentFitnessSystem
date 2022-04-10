@@ -1,5 +1,6 @@
 package com.example.intelligentfitnesssystem.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.VideoFrame;
 import com.example.intelligentfitnesssystem.databinding.ActivityDetectBinding;
 import com.example.intelligentfitnesssystem.util.OkSocketSendData;
+import com.example.intelligentfitnesssystem.util.Permission;
 import com.xuhao.didi.core.pojo.OriginalData;
 import com.xuhao.didi.core.protocol.IReaderProtocol;
 import com.xuhao.didi.socket.client.sdk.OkSocket;
@@ -40,6 +42,7 @@ import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo;
 import com.xuhao.didi.socket.client.sdk.client.OkSocketOptions;
 import com.xuhao.didi.socket.client.sdk.client.action.SocketActionAdapter;
 import com.xuhao.didi.socket.client.sdk.client.connection.IConnectionManager;
+import com.yanzhenjie.permission.AndPermission;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -61,8 +64,6 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
     public SurfaceHolder holder;
     public IConnectionManager manager;
     public LinkedList<VideoFrame> rf = new LinkedList<>();
-    public int i_rf = 0;
-    public Timer timer;
     private ActivityDetectBinding binding;
     private boolean isBegin = true;
     private boolean isPause = false;
@@ -75,12 +76,17 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         setContentView(view);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         holder = binding.sfv.getHolder();
-        timer = new Timer();
         Intent intent = getIntent();
         type = intent.getStringExtra("type");
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        AndPermission.with(DetectActivity.this)
+                .requestCode(300)
+                .permission(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .rationale(Permission.getRationaleListener(DetectActivity.this))
+                .callback(DetectActivity.this)
+                .start();
         binding.back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,14 +110,14 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 if (isBegin) {
                     //begin
                     binding.sfv.setVisibility(View.VISIBLE);
-//                        initOksocket("192.168.43.200", 8004, null);
-//                        manager.connect();
-                    requestSocket(type);
+                    initOkSocket("172.16.11.16", 8004, type);
+                    manager.connect();
+//                    requestSocket(type);
                     binding.switchBtn.setImageResource(R.drawable.pause);
                     binding.end.setVisibility(View.VISIBLE);
                     binding.download.setVisibility(View.GONE);
                     isBegin = false;
-                }else{
+                } else {
                     //to pause
                     binding.download.setVisibility(View.VISIBLE);
                     binding.switchBtn.setImageResource(R.drawable.head_on);
@@ -127,7 +133,10 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                     manager.disconnect();
                 }
                 //iv.setImageBitmap(null);
-
+                binding.iv.setImageBitmap(null);
+                camera = null;
+                manager.disconnect();
+                manager = null;
                 binding.sfv.setVisibility(View.GONE);
                 binding.end.setVisibility(View.GONE);
                 binding.switchBtn.setImageResource(R.drawable.record);
@@ -151,7 +160,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         return super.onSupportNavigateUp();
     }
 
-    public void show() {
+   /* public void show() {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -173,11 +182,12 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         } else {
             timer.cancel();
         }
-    }
+    }*/
 
-    public void initOksocket(String host, int port, String pos) {
+    public void initOkSocket(String host, int port, String pos) {
         ConnectionInfo info = new ConnectionInfo(host, port);
         manager = OkSocket.open(info);
+        if (manager == null) return;
         OkSocketOptions options = manager.getOption();
         OkSocketOptions.Builder builder = new OkSocketOptions.Builder(options);
         builder.setReaderProtocol(new IReaderProtocol() {
@@ -197,11 +207,10 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
             public void onSocketConnectionSuccess(ConnectionInfo info, String action) {
                 super.onSocketConnectionSuccess(info, action);
                 Log.i("socket***conn", "connected");
-
+                if (manager == null) return;
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-
                         try {
                             camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                         } catch (RuntimeException e) {
@@ -227,39 +236,41 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         //设置预览图像分辨率
                         parameters.setPreviewSize(width, height);
                         //相机旋转90度
-                        camera.setDisplayOrientation(90);
-                        //配置camera参数
-                        camera.setParameters(parameters);
-                        try {
-                            camera.setPreviewDisplay(holder);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        OkSocketSendData s = new OkSocketSendData();
-                        if (pos != null) {
-                            s.setVideoFrame(pos.length(), pos.getBytes());
-                            manager.send(s); //先发送要检测的姿态类型
-                        }
-
-                        //设置监听获取视频流的每一帧
-                        camera.setPreviewCallback(new Camera.PreviewCallback() {
-                            @Override
-                            public void onPreviewFrame(byte[] data, Camera camera) {
-                                if (manager.isDisconnecting()) return;
-                                data = rotateYUV420Degree90(data, width, height);
-                                data = rotateYUV420Degree90(data, height, width);
-                                data = rotateYUV420Degree90(data, width, height);
-                                YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, height, width, null);
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                yuvimage.compressToJpeg(new Rect(0, 0, height, width), 80, baos);
-                                Bitmap bmp = BitmapFactory.decodeByteArray(baos.toByteArray(), 0, baos.toByteArray().length);
-                                bmp.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-                                s.setVideoFrame(baos.toByteArray().length, baos.toByteArray());
-                                manager.send(s); //发送视频帧
+                        if (manager != null) {
+                            camera.setDisplayOrientation(90);
+                            //配置camera参数
+                            camera.setParameters(parameters);
+                            try {
+                                camera.setPreviewDisplay(holder);
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                        });
-                        //调用startPreview()用以更新preview的surface
-                        camera.startPreview();
+                            OkSocketSendData s = new OkSocketSendData();
+                            if (pos != null) {
+                                s.setVideoFrame(pos.length(), pos.getBytes());
+                                manager.send(s); //先发送要检测的姿态类型
+                            }
+
+                            //设置监听获取视频流的每一帧
+                            camera.setPreviewCallback(new Camera.PreviewCallback() {
+                                @Override
+                                public void onPreviewFrame(byte[] data, Camera camera) {
+                                    if (manager == null || manager.isDisconnecting()) return;
+                                    data = rotateYUV420Degree90(data, width, height);
+                                    data = rotateYUV420Degree90(data, height, width);
+                                    data = rotateYUV420Degree90(data, width, height);
+                                    YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, height, width, null);
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    yuvimage.compressToJpeg(new Rect(0, 0, height, width), 80, baos);
+                                    Bitmap bmp = BitmapFactory.decodeByteArray(baos.toByteArray(), 0, baos.toByteArray().length);
+                                    bmp.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+                                    s.setVideoFrame(baos.toByteArray().length, baos.toByteArray());
+                                    manager.send(s); //发送视频帧
+                                }
+                            });
+                            //调用startPreview()用以更新preview的surface
+                            camera.startPreview();
+                        }
                     }
                 }).start();
             }
@@ -295,7 +306,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
      * 请求socket的host、port
      */
     public void requestSocket(String posture) {
-        String path = "http://172.16.213.177:8080" + "/postures/socket/info";
+        String path = getString(R.string.baseUrl) + "postures/socket/info";
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(path)
@@ -310,15 +321,16 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 String info = response.body().string();
+                System.out.println("*****socket res:" + info);
                 JSONObject json = JSON.parseObject(info);
-                if (json.getString("msg").equals("success")) {
+                if (json.getInteger("status") == 0) {
                     JSONObject j = json.getJSONObject("data");
                     if (manager == null) {
-                        initOksocket(j.getString("host"), j.getInteger("port"), posture);
+                        initOkSocket(j.getString("host"), j.getInteger("port"), posture);
+//                        initOkSocket("40f730q296.qicp.vip",41146,posture);
                     }
                     if (null != manager && !manager.isConnect()) {
                         manager.connect();
-
                     }
 
                 }

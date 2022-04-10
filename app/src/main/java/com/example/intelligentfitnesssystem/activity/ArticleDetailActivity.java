@@ -30,6 +30,7 @@ import com.example.intelligentfitnesssystem.util.EditIsCanUseBtnUtils;
 import com.example.intelligentfitnesssystem.util.Http;
 import com.example.intelligentfitnesssystem.util.SoftKeyBoardListener;
 
+import static com.example.intelligentfitnesssystem.MyApplication.From;
 import static com.example.intelligentfitnesssystem.MyApplication.commentId;
 import static com.example.intelligentfitnesssystem.MyApplication.localUser;
 
@@ -156,6 +157,24 @@ public class ArticleDetailActivity extends AppCompatActivity {
                         }
                     }).start();
                 }
+            }
+        });
+        binding.comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.commentInput.requestFocus();
+                InputMethodManager inputMethodManager = (InputMethodManager) binding.commentInput.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.showSoftInput(binding.commentInput, 0);
+            }
+        });
+        binding.transport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                From = "detail";
+                Intent intent = new Intent(ArticleDetailActivity.this, ReleaseArticleActivity.class);
+                intent.putExtra("Article", JSON.toJSONString(article));
+                startActivity(intent);
+                finish();
             }
         });
         binding.commentInput.setOnFocusChangeListener(new View.OnFocusChangeListener() {

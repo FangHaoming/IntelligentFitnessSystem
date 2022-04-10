@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -231,6 +232,14 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
+            listViewHolder.content.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);
+                    intent.putExtra("Article", JSON.toJSONString(article));
+                    mContext.startActivity(intent);
+                }
+            });
             listViewHolder.comment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -271,6 +280,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         Button comment;
         TextView comment_num;
         Button transport;
+        LinearLayout content;
 
         public ListViewHolder(View itemView) {
             super(itemView);
@@ -288,6 +298,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             comment = itemView.findViewById(R.id.comment);
             comment_num = itemView.findViewById(R.id.comment_num);
             transport = itemView.findViewById(R.id.transport);
+            content = itemView.findViewById(R.id.content);
         }
     }
 }

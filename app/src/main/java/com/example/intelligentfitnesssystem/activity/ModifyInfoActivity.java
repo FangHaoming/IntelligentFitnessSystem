@@ -32,6 +32,7 @@ import com.example.intelligentfitnesssystem.databinding.ActivityModifyBinding;
 import com.example.intelligentfitnesssystem.util.AvatarStudio;
 import com.example.intelligentfitnesssystem.util.FileUtils;
 import com.example.intelligentfitnesssystem.util.Http;
+import com.example.intelligentfitnesssystem.util.Permission;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.Rationale;
 import com.yanzhenjie.permission.RationaleListener;
@@ -70,7 +71,7 @@ public class ModifyInfoActivity extends AppCompatActivity {
         AndPermission.with(ModifyInfoActivity.this)
                 .requestCode(300)
                 .permission(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .rationale(rationaleListener)
+                .rationale(Permission.getRationaleListener(ModifyInfoActivity.this))
                 .callback(ModifyInfoActivity.this)
                 .start();
 
@@ -241,27 +242,4 @@ public class ModifyInfoActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-    private RationaleListener rationaleListener = new RationaleListener() {
-        @Override
-        public void showRequestPermissionRationale(int i, final Rationale rationale) {
-            com.yanzhenjie.alertdialog.AlertDialog.newBuilder(ModifyInfoActivity.this)
-                    .setTitle("请求权限")
-                    .setMessage("请求权限")
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                            rationale.resume();
-                        }
-                    })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                            rationale.cancel();
-                        }
-                    }).show();
-        }
-    };
 }

@@ -45,6 +45,7 @@ public class MyApplication extends Application {
     public static SharedPreferences.Editor global_editor;
     public static SharedPreferences.Editor local_editor;
     public static int commentId = -1;
+    public static String From = null;
 
     @Override
     public void onCreate() {

@@ -26,6 +26,7 @@ import com.example.intelligentfitnesssystem.bean.ImageBean;
 import com.example.intelligentfitnesssystem.databinding.ActivityReleaseArticleBinding;
 import com.example.intelligentfitnesssystem.util.GlideV4ImageEngine;
 import com.example.intelligentfitnesssystem.util.Loader;
+import com.example.intelligentfitnesssystem.util.Permission;
 import com.yanzhenjie.alertdialog.AlertDialog;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.PermissionNo;
@@ -39,6 +40,8 @@ import com.zhihu.matisse.MimeType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.intelligentfitnesssystem.MyApplication.From;
 
 public class ReleaseArticleActivity extends AppCompatActivity {
 
@@ -59,9 +62,17 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         binding.back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ReleaseArticleActivity.this, MainActivity.class);
-                intent.putExtra("from","release");
-                startActivity(intent);
+                Intent intent = null;
+                if (From != null && From.equals("detail")) {
+                    intent = new Intent(ReleaseArticleActivity.this, ArticleDetailActivity.class);
+                    From = null;
+                    intent.putExtra("Article", JSON.toJSONString(article));
+                    startActivity(intent);
+                } else if (From == null) {
+                    intent = new Intent(ReleaseArticleActivity.this, MainActivity.class);
+                    From = "release";
+                    startActivity(intent);
+                }
                 overridePendingTransition(0, R.anim.slide_right_out);
                 finish();
             }
@@ -126,35 +137,10 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         AndPermission.with(ReleaseArticleActivity.this)
                 .requestCode(300)
                 .permission(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .rationale(rationaleListener)
+                .rationale(Permission.getRationaleListener(ReleaseArticleActivity.this))
                 .callback(ReleaseArticleActivity.this)
                 .start();
-
-
-
     }
-    private RationaleListener rationaleListener = new RationaleListener() {
-        @Override
-        public void showRequestPermissionRationale(int i, final Rationale rationale) {
-            AlertDialog.newBuilder(ReleaseArticleActivity.this)
-                    .setTitle("请求权限")
-                    .setMessage("请求权限")
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                            rationale.resume();
-                        }
-                    })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                            rationale.cancel();
-                        }
-                    }).show();
-        }
-    };
 
     @Override
     protected void onPause() {
@@ -220,9 +206,18 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent intent = new Intent(ReleaseArticleActivity.this, MainActivity.class);
-            intent.putExtra("from","release");
-            startActivity(intent);
+            Intent intent = null;
+            if (From != null && From.equals("detail")) {
+                intent = new Intent(ReleaseArticleActivity.this, ArticleDetailActivity.class);
+                From = null;
+                intent.putExtra("Article", JSON.toJSONString(article));
+                startActivity(intent);
+            } else if (From == null) {
+                intent = new Intent(ReleaseArticleActivity.this, MainActivity.class);
+                From = "release";
+                startActivity(intent);
+            }
+            overridePendingTransition(0, R.anim.slide_right_out);
             finish();
         }
         return true;

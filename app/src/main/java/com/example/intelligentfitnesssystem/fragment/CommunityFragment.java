@@ -2,6 +2,7 @@ package com.example.intelligentfitnesssystem.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.example.intelligentfitnesssystem.MyApplication.From;
 import static com.example.intelligentfitnesssystem.MyApplication.chosenArticleList;
 import static com.example.intelligentfitnesssystem.MyApplication.focusArticleList;
 import static com.example.intelligentfitnesssystem.MyApplication.getArticleList;
@@ -182,6 +184,12 @@ public class CommunityFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        System.out.println("*****fragment attach");
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         System.out.println("*****fragment start");
@@ -198,8 +206,10 @@ public class CommunityFragment extends Fragment {
     public void onResume() {
         super.onResume();
         initView();
-        if (requireActivity().getIntent().getStringExtra("from") == null || !requireActivity().getIntent().getStringExtra("from").equals("release")) {
-            System.out.println("*****fragment Resume");
+        System.out.println("*****fragment Resume");
+        if (From == null || !From.equals("release")) {
+            From = null;
+            System.out.println("*****fragment Resume intent " + requireActivity().getIntent().getStringExtra("from"));
             System.out.println("*****resume type: " + ArticleListType);
             new Thread(new Runnable() {
                 @Override
