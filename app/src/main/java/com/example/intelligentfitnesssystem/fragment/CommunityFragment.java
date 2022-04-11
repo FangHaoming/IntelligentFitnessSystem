@@ -114,7 +114,7 @@ public class CommunityFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (!isLogin) {
+                if (isLogin) {
                     Intent intent = new Intent(getContext(), LoginActivity.class);
                     startActivity(intent);
                     return;

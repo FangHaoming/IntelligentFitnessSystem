@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -38,7 +40,17 @@ import com.yzs.imageshowpickerview.ImageShowPickerListener;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.example.intelligentfitnesssystem.MyApplication.From;
@@ -49,6 +61,8 @@ public class ReleaseArticleActivity extends AppCompatActivity {
     private List<ImageBean> list = new ArrayList<>();
     private View root;
     private Article article = new Article();
+    private Article paramsArticle = new Article();
+    private String Type = null;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -80,11 +94,12 @@ public class ReleaseArticleActivity extends AppCompatActivity {
         binding.picker.setImageLoaderInterface(new Loader());
         binding.picker.setNewData(list);
         binding.picker.setShowAnim(false);
-        if (getIntent().getStringExtra("type") != null) {
-            if (getIntent().getStringExtra("type").equals("photo")) {
+        Type = getIntent().getStringExtra("type");
+        if (Type != null) {
+            if (Type.equals("photo")) {
                 binding.picker.setMaxNum(9);
             }
-            if (getIntent().getStringExtra("type").equals("video")) {
+            if (Type.equals("video")) {
                 binding.picker.setMaxNum(1);
             }
         } else {
@@ -93,6 +108,9 @@ public class ReleaseArticleActivity extends AppCompatActivity {
             System.out.println("*****release rec article:" + getIntent().getStringExtra("Article"));
 
             article = JSON.parseObject(getIntent().getStringExtra("Article"), Article.class);
+            paramsArticle.setShareArticle(article);
+            paramsArticle.setIsShare(1);
+            paramsArticle.setShareArticleId(article.getId());
             if (article.getImg().length > 0 && !article.getImg()[0].split("\\.")[1].equals("mp4")) {
                 Glide.with(ReleaseArticleActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + getString(R.string.api_get_articleImg) + article.getImg()[0]).into(binding.shareImg);
             } else if (article.getPublisherImg() != null) {
@@ -108,12 +126,22 @@ public class ReleaseArticleActivity extends AppCompatActivity {
 
         }
 
+        binding.releaseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!binding.contentText.getText().toString().trim().equals("")) {
+                    paramsArticle.setText(binding.contentText.getText().toString());
+                }
+                System.out.println("*****videoData:" + Arrays.toString(paramsArticle.getImgData()));
+            }
+        });
+
 
         binding.picker.setPickerListener(new ImageShowPickerListener() {
             @Override
             public void addOnClickListener(int remainNum) {
                 Matisse.from(ReleaseArticleActivity.this)
-                        .choose(getIntent().getStringExtra("type") != null && getIntent().getStringExtra("type").equals("photo") ? MimeType.ofImage() : MimeType.ofVideo())
+                        .choose(Type != null && Type.equals("photo") ? MimeType.ofImage() : MimeType.ofVideo())
                         .showSingleMediaType(true)
                         .countable(true)
                         .maxSelectable(remainNum + 1)
@@ -169,10 +197,46 @@ public class ReleaseArticleActivity extends AppCompatActivity {
             if (uriList.size() == 1) {
                 binding.picker.addData(new ImageBean(getRealFilePath(ReleaseArticleActivity.this, uriList.get(0))));
             } else {
-                List<ImageBean> list = new ArrayList<>();
+                list = new ArrayList<>();
+                List<byte[]> imgData = new ArrayList<>();
+                List<String> img = new ArrayList<>();
                 for (Uri uri : uriList) {
-                    list.add(new ImageBean(getRealFilePath(ReleaseArticleActivity.this, uri)));
+                    String realPath = getRealFilePath(ReleaseArticleActivity.this, uri);
+                    list.add(new ImageBean(realPath));
+                    if (Type.equals("photo")) {
+                        Bitmap bitmap = null;
+                        try {
+                            bitmap = BitmapFactory.decodeStream(new FileInputStream(realPath));
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                        byte[] img_data = out.toByteArray();
+                        imgData.add(img_data);
+                    }
+                    System.out.println("*****type:"+Type);
+                    if (Type.equals("video")) {
+                        System.out.println("*****type video");
+                        byte[] videoData = null;
+                        try {
+                            File file = new File(realPath);
+                            if(!file.exists()){
+                                System.out.println("*****file not found");
+                            }
+                            videoData = new byte[(int) file.length()];
+                            FileInputStream fis = new FileInputStream(file);
+                            fis.read(videoData);
+                            fis.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        imgData.add(videoData);
+                    }
+                    img.add(realPath.split("/")[realPath.split("/").length - 1]);
                 }
+                paramsArticle.setImgData(imgData.toArray(new byte[imgData.size()][]));
+                paramsArticle.setImg(img.toArray(new String[img.size()]));
                 binding.picker.addData(list);
             }
         }
