@@ -8,6 +8,8 @@ import static java.util.Arrays.sort;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +21,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.intelligentfitnesssystem.activity.ArticleDetailActivity;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
 import com.example.intelligentfitnesssystem.activity.ReleaseArticleActivity;
@@ -74,11 +82,15 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
-            int safePosition = holder.getBindingAdapterPosition();
+            int safePosition = holder.getLayoutPosition();
             Article article = list.get(safePosition);
             ListViewHolder listViewHolder = (ListViewHolder) holder;
             if (article.getPublisherImg() != null) {
-                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + article.getPublisherImg()).into(listViewHolder.head);
+                listViewHolder.head.setTag(article.getPublisherImg());
+                Glide.with(mContext)
+                        .asBitmap()
+                        .load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + article.getPublisherImg())
+                        .into(listViewHolder.head);
             }
             listViewHolder.head.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -167,17 +179,20 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if (article.getImg().length > 0 && !article.getImg()[0].split("\\.")[1].equals("mp4")) {
                 if (article.getImg()[0] != null) {
                     listViewHolder.img_0.setVisibility(View.VISIBLE);
-                    listViewHolder.img_0.setImageResource(R.drawable.img_preview);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0]).into(listViewHolder.img_0);
+                    Glide.with(mContext)
+                            .load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0])
+                            .placeholder(R.drawable.img_preview)
+                            .into(listViewHolder.img_0);
                 }
-                if (article.getImg().length > 1 && article.getImg()[1] != null) {
-                    listViewHolder.img_1.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[1]).into(listViewHolder.img_1);
-                }
-                if (article.getImg().length > 2 && article.getImg()[2] != null) {
-                    listViewHolder.img_2.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[2]).into(listViewHolder.img_2);
-                }
+//                if (article.getImg().length > 1 && article.getImg()[1] != null) {
+//                    listViewHolder.img_1.setVisibility(View.VISIBLE);
+//                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[1]).into(listViewHolder.img_1);
+//
+//                }
+//                if (article.getImg().length > 2 && article.getImg()[2] != null) {
+//                    listViewHolder.img_2.setVisibility(View.VISIBLE);
+//                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[2]).into(listViewHolder.img_2);
+//                }
             }
             if (article.getImg().length == 1 && article.getImg()[0].split("\\.")[1].equals("mp4")) {
                 listViewHolder.video.setVisibility(View.VISIBLE);
@@ -253,10 +268,19 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext.getApplicationContext(), ReleaseArticleActivity.class);
-                    intent.putExtra("Article",JSON.toJSONString(article));
+                    intent.putExtra("Article", JSON.toJSONString(article));
                     mContext.startActivity(intent);
                 }
             });
+        }
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if(holder instanceof ListViewHolder){
+            ListViewHolder listViewHolder = (ListViewHolder) holder;
+            Glide.with(mContext).clear(listViewHolder.img_0);
         }
     }
 

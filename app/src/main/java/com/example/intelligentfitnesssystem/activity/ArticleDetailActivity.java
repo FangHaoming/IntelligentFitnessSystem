@@ -1,11 +1,13 @@
 package com.example.intelligentfitnesssystem.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.PersistableBundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -26,6 +28,7 @@ import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.bean.Comment;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
 import com.example.intelligentfitnesssystem.databinding.ActivityArticleDetailBinding;
+import com.example.intelligentfitnesssystem.util.AppManager;
 import com.example.intelligentfitnesssystem.util.EditIsCanUseBtnUtils;
 import com.example.intelligentfitnesssystem.util.Http;
 import com.example.intelligentfitnesssystem.util.SoftKeyBoardListener;
@@ -90,19 +93,21 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        binding.recyclerView.setLayoutManager(new LinearLayoutManager(ArticleDetailActivity.this));
-                        binding.recyclerView.setAdapter(commentAdapter);
-                        if (article.getPublisherImg() != null) {
-                            Glide.with(ArticleDetailActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + article.getPublisherImg()).into(binding.head);
+                        if (!AppManager.isDestroy(ArticleDetailActivity.this)) {
+                            binding.recyclerView.setLayoutManager(new LinearLayoutManager(ArticleDetailActivity.this));
+                            binding.recyclerView.setAdapter(commentAdapter);
+                            if (article.getPublisherImg() != null) {
+                                Glide.with(ArticleDetailActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + article.getPublisherImg()).into(binding.head);
+                            }
+                            if (isPraise) {
+                                binding.praise.setBackground(ContextCompat.getDrawable(ArticleDetailActivity.this, R.drawable.praise_clicked));
+                            }
+                            binding.nickname.setText(article.getPublisherName());
+                            binding.createTime.setText(article.getCreateTime());
+                            binding.contentText.setText(article.getText());
+                            binding.praiseNum.setText(String.valueOf(article.getLikeCount()));
+                            binding.commentNum.setText(String.valueOf(article.getCommentCount()));
                         }
-                        if (isPraise) {
-                            binding.praise.setBackground(ContextCompat.getDrawable(ArticleDetailActivity.this, R.drawable.praise_clicked));
-                        }
-                        binding.nickname.setText(article.getPublisherName());
-                        binding.createTime.setText(article.getCreateTime());
-                        binding.contentText.setText(article.getText());
-                        binding.praiseNum.setText(String.valueOf(article.getLikeCount()));
-                        binding.commentNum.setText(String.valueOf(article.getCommentCount()));
                     }
                 });
             }
@@ -260,4 +265,21 @@ public class ArticleDetailActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        System.out.println("*****detail pause");
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent intent = new Intent(ArticleDetailActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        return true;
+    }
+
 }

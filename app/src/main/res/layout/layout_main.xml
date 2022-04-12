@@ -11,25 +11,21 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!--Fragment显示区域，注意它的id-->
         <FrameLayout
             android:id="@android:id/tabcontent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            />
+            android:layout_weight="1" />
 
-        <!--内容和底部标签分割线-->
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
             android:background="@color/black" />
 
-        <!--底部页签显示区域，注意它的id-->
         <TabWidget
             android:id="@android:id/tabs"
             android:layout_width="match_parent"
-            android:padding="5dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="5dp" />
     </LinearLayout>
 </androidx.fragment.app.FragmentTabHost>

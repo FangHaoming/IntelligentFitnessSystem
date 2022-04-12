@@ -3,6 +3,7 @@ package com.example.intelligentfitnesssystem.util;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.os.Build;
 
 import java.util.Stack;
 
@@ -101,6 +102,14 @@ public class AppManager {
             System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static boolean isDestroy(Activity mActivity) {
+        if (mActivity== null || mActivity.isFinishing() || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && mActivity.isDestroyed())) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

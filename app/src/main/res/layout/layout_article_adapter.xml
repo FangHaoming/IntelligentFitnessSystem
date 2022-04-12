@@ -97,17 +97,16 @@
             <ImageView
                 android:id="@+id/image_0"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:layout_marginHorizontal="2dp"
                 android:layout_weight="1"
                 android:contentDescription="@string/nothing"
-                android:src="@drawable/img_preview"
                 android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/image_1"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:layout_marginHorizontal="2dp"
                 android:layout_weight="1"
                 android:contentDescription="@string/nothing"
@@ -117,7 +116,7 @@
             <ImageView
                 android:id="@+id/image_2"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:layout_marginHorizontal="2dp"
                 android:layout_weight="1"
                 android:contentDescription="@string/nothing"
@@ -130,6 +129,13 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:visibility="gone" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/share"
+            android:orientation="horizontal">
+
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

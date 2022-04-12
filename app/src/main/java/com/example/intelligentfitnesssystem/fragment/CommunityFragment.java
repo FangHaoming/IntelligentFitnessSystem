@@ -113,8 +113,7 @@ public class CommunityFragment extends Fragment {
         binding.releaseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (isLogin) {
+                if (!isLogin) {
                     Intent intent = new Intent(getContext(), LoginActivity.class);
                     startActivity(intent);
                     return;
@@ -288,6 +287,7 @@ public class CommunityFragment extends Fragment {
                         for (Object object : jsonArray) {
                             list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
                         }
+                        System.out.println("*****article "+JSON.toJSONString(list.get(0)));
                     }
                 }
                 requireActivity().runOnUiThread(new Runnable() {
