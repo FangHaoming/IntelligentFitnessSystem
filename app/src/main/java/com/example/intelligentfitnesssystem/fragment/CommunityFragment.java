@@ -232,8 +232,10 @@ public class CommunityFragment extends Fragment {
                     requireActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            articleAdapter.setList(list);
-                            if (binding != null && articleAdapter != null) {
+                            if (articleAdapter != null) {
+                                articleAdapter.setList(list);
+                            }
+                            if (binding != null) {
                                 binding.recyclerView.getRecycledViewPool().clear();
                                 binding.recyclerView.setAdapter(articleAdapter);
                             }
@@ -287,15 +289,19 @@ public class CommunityFragment extends Fragment {
                         for (Object object : jsonArray) {
                             list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
                         }
-                        System.out.println("*****article "+JSON.toJSONString(list.get(0)));
+                        System.out.println("*****article " + JSON.toJSONString(list.get(0)));
                     }
                 }
                 requireActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        articleAdapter.setList(list);
-                        binding.recyclerView.getRecycledViewPool().clear();
-                        binding.recyclerView.setAdapter(articleAdapter);
+                        if (articleAdapter != null) {
+                            articleAdapter.setList(list);
+                        }
+                        if (binding != null) {
+                            binding.recyclerView.getRecycledViewPool().clear();
+                            binding.recyclerView.setAdapter(articleAdapter);
+                        }
                     }
                 });
             }

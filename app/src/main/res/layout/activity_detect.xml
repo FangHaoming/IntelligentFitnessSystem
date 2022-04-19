@@ -14,8 +14,8 @@
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent" />
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:src="@drawable/back_arrow_white"
         android:layout_margin="10dp"
         android:id="@+id/back"
@@ -36,16 +36,6 @@
         android:id="@+id/pause_area"
         >
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/switchBtn"
-            android:visibility="gone"
-            android:src="@drawable/download"
-            android:id="@+id/download"/>
-        <ImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:src="@drawable/record"
@@ -54,15 +44,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:id="@+id/switchBtn"/>
         <ImageView
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/switchBtn"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/stop"
+            android:src="@drawable/download"
             android:visibility="gone"
-            android:id="@+id/end"/>
+            android:id="@+id/download"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

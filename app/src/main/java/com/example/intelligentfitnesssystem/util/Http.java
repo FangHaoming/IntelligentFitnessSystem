@@ -52,7 +52,7 @@ public class Http {
         }
         return context.getResources().getString(R.string.status_server_error);
     }
-
+    //发送登录请求
     public static String commitLogin(Context context, String phone, String pwd) throws IOException {
         User user = new User();
         user.setPhone(phone);

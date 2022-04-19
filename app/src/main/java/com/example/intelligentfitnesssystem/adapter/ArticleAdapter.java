@@ -83,107 +83,110 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
             int safePosition = holder.getLayoutPosition();
+            int adapterPosition = holder.getBindingAdapterPosition();
+            Article adapter_article = list.get(adapterPosition);
             Article article = list.get(safePosition);
             ListViewHolder listViewHolder = (ListViewHolder) holder;
-            if (article.getPublisherImg() != null) {
-                listViewHolder.head.setTag(article.getPublisherImg());
-                Glide.with(mContext)
-                        .asBitmap()
-                        .load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + article.getPublisherImg())
-                        .into(listViewHolder.head);
-            }
-            listViewHolder.head.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                MyResponse<User> result = JSON.parseObject(Http.getUserInfo(mContext, article.getUserId()), (Type) MyResponse.class);
-                                if (result.getStatus() == 0) {
-                                    Intent intent = new Intent(mContext, UserInfoActivity.class);
-                                    intent.putExtra("User", JSON.toJSONString(result.getData()));
-                                    mContext.startActivity(intent);
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
-                }
-            });
-            listViewHolder.nickname.setText(String.valueOf(article.getPublisherName()));
-            listViewHolder.createTime.setText(article.getCreateTime());
-            for (User user : localUser.getFocus()) {
-                if (user.getId() == article.getUserId()) {
-                    isFocus = true;
-                    focusedUser = user;
-                }
-            }
-            if (isFocus) {
-                listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
-            }
-            listViewHolder.focus.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!isFocus) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, article.getUserId()), (Type) MyResponse.class);
-                                            if (result != null && result.getStatus() == 0) {
-                                                listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
-
-                                            } else {
-                                                Looper.prepare();
-                                                Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
-                                                Looper.loop();
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }).start();
-                            } else {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, article.getUserId()), (Type) MyResponse.class);
-                                            if (result != null && result.getStatus() == 0) {
-                                                listViewHolder.focus.setText(mContext.getResources().getString(R.string.focus));
-                                            } else {
-                                                Looper.prepare();
-                                                Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
-                                                Looper.loop();
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }).start();
-                            }
-                        }
-                    }).start();
-
-                }
-            });
-            if (article.getText() != null && !article.getText().equals("")) {
-                listViewHolder.content_text.setVisibility(View.VISIBLE);
-                listViewHolder.content_text.setText(article.getText());
-            }
-            if (article.getImg().length > 0 && !article.getImg()[0].split("\\.")[1].equals("mp4")) {
-                if (article.getImg()[0] != null) {
-                    listViewHolder.img_0.setVisibility(View.VISIBLE);
+            if (article != null) {
+                if (article.getPublisherImg() != null) {
+                    listViewHolder.head.setTag(safePosition);
                     Glide.with(mContext)
-                            .load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0])
-                            .placeholder(R.drawable.img_preview)
-                            .into(listViewHolder.img_0);
+                            .asBitmap()
+                            .load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + article.getPublisherImg())
+                            .into(listViewHolder.head);
                 }
+                listViewHolder.head.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    MyResponse<User> result = JSON.parseObject(Http.getUserInfo(mContext, article.getUserId()), (Type) MyResponse.class);
+                                    if (result.getStatus() == 0) {
+                                        Intent intent = new Intent(mContext, UserInfoActivity.class);
+                                        intent.putExtra("User", JSON.toJSONString(result.getData()));
+                                        mContext.startActivity(intent);
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                });
+                listViewHolder.nickname.setText(String.valueOf(article.getPublisherName()));
+                listViewHolder.createTime.setText(article.getCreateTime());
+                for (User user : localUser.getFocus()) {
+                    if (user.getId() == article.getUserId()) {
+                        isFocus = true;
+                        focusedUser = user;
+                    }
+                }
+                if (isFocus) {
+                    listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
+                }
+                listViewHolder.focus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!isFocus) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, article.getUserId()), (Type) MyResponse.class);
+                                                if (result != null && result.getStatus() == 0) {
+                                                    listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
+
+                                                } else {
+                                                    Looper.prepare();
+                                                    Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                                    Looper.loop();
+                                                }
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }).start();
+                                } else {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, article.getUserId()), (Type) MyResponse.class);
+                                                if (result != null && result.getStatus() == 0) {
+                                                    listViewHolder.focus.setText(mContext.getResources().getString(R.string.focus));
+                                                } else {
+                                                    Looper.prepare();
+                                                    Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                                    Looper.loop();
+                                                }
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }).start();
+                                }
+                            }
+                        }).start();
+
+                    }
+                });
+                if (article.getText() != null && !article.getText().equals("")) {
+                    listViewHolder.content_text.setVisibility(View.VISIBLE);
+                    listViewHolder.content_text.setText(article.getText());
+                }
+                if (article.getImg().length > 0 && !article.getImg()[0].split("\\.")[1].equals("mp4")) {
+                    if (article.getImg()[0] != null) {
+                        listViewHolder.img_0.setVisibility(View.VISIBLE);
+                        Glide.with(mContext)
+                                .load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0])
+                                .placeholder(R.drawable.img_preview)
+                                .into(listViewHolder.img_0);
+                    }
 //                if (article.getImg().length > 1 && article.getImg()[1] != null) {
 //                    listViewHolder.img_1.setVisibility(View.VISIBLE);
 //                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[1]).into(listViewHolder.img_1);
@@ -193,92 +196,98 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 //                    listViewHolder.img_2.setVisibility(View.VISIBLE);
 //                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[2]).into(listViewHolder.img_2);
 //                }
-            }
-            if (article.getImg().length == 1 && article.getImg()[0].split("\\.")[1].equals("mp4")) {
-                listViewHolder.video.setVisibility(View.VISIBLE);
-                listViewHolder.video.bind(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0]);
-            }
-            int[] temp = article.getLikeId();
-            sort(temp);
-            isPraise = -1 != binarySearch(temp, localUser.getId());
-            if (isPraise) {
-                listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
-            }
-            listViewHolder.praise.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("UseCompatLoadingForDrawables")
-                @Override
-                public void onClick(View v) {
-                    if (isPraise) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, article.getId()), (Type) MyResponse.class);
-                                    if (result != null && result.getStatus() == 0) {
-                                        listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise));
-                                        article.setLikeCount(article.getLikeCount() - 1);
-                                        listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
-                                        isPraise = false;
-
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-                    } else {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, article.getId()), (Type) MyResponse.class);
-                                    if (result != null && result.getStatus() == 0) {
-                                        listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
-                                        article.setLikeCount(article.getLikeCount() + 1);
-                                        listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
-                                        isPraise = true;
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
+                }
+                if (article.getImg().length == 1 && article.getImg()[0].split("\\.")[1].equals("mp4")) {
+                    if (listViewHolder.video.getTag() != null && !listViewHolder.video.getTag().equals(article.getImg()[0])) {
+                        listViewHolder.video.setVisibility(View.GONE);
                     }
+                    listViewHolder.video.setTag(article.getImg()[0]);
+                    listViewHolder.video.setVisibility(View.VISIBLE);
+                    listViewHolder.video.bind(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0]);
                 }
-            });
-            listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
-            listViewHolder.content.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);
-                    intent.putExtra("Article", JSON.toJSONString(article));
-                    mContext.startActivity(intent);
+                System.out.println("*****position:" + safePosition + "  " + adapterPosition + " " + listViewHolder.video.getTag() + " " + Arrays.toString(article.getImg()));
+                int[] temp = article.getLikeId();
+                sort(temp);
+                isPraise = -1 != binarySearch(temp, localUser.getId());
+                if (isPraise) {
+                    listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
                 }
-            });
-            listViewHolder.comment.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);
-                    intent.putExtra("Article", JSON.toJSONString(article));
-                    mContext.startActivity(intent);
-                }
-            });
-            listViewHolder.comment_num.setText(String.valueOf(article.getCommentCount()));
-            listViewHolder.transport.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext.getApplicationContext(), ReleaseArticleActivity.class);
-                    intent.putExtra("Article", JSON.toJSONString(article));
-                    mContext.startActivity(intent);
-                }
-            });
+                listViewHolder.praise.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("UseCompatLoadingForDrawables")
+                    @Override
+                    public void onClick(View v) {
+                        if (isPraise) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, article.getId()), (Type) MyResponse.class);
+                                        if (result != null && result.getStatus() == 0) {
+                                            listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise));
+                                            article.setLikeCount(article.getLikeCount() - 1);
+                                            listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
+                                            isPraise = false;
+
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
+                        } else {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, article.getId()), (Type) MyResponse.class);
+                                        if (result != null && result.getStatus() == 0) {
+                                            listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                                            article.setLikeCount(article.getLikeCount() + 1);
+                                            listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
+                                            isPraise = true;
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).start();
+                        }
+                    }
+                });
+                listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
+                listViewHolder.content.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);
+                        intent.putExtra("Article", JSON.toJSONString(article));
+                        mContext.startActivity(intent);
+                    }
+                });
+                listViewHolder.comment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);
+                        intent.putExtra("Article", JSON.toJSONString(article));
+                        mContext.startActivity(intent);
+                    }
+                });
+                listViewHolder.comment_num.setText(String.valueOf(article.getCommentCount()));
+                listViewHolder.transport.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext.getApplicationContext(), ReleaseArticleActivity.class);
+                        intent.putExtra("Article", JSON.toJSONString(article));
+                        mContext.startActivity(intent);
+                    }
+                });
+            }
         }
     }
 
     @Override
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewRecycled(holder);
-        if(holder instanceof ListViewHolder){
+        if (holder instanceof ListViewHolder) {
             ListViewHolder listViewHolder = (ListViewHolder) holder;
             Glide.with(mContext).clear(listViewHolder.img_0);
         }

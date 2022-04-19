@@ -113,7 +113,6 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="20dp"
                 android:paddingHorizontal="10dp"
-                android:text="asdgasdg"
                 android:textColor="@color/text_selected"
                 android:textSize="20sp" />
 

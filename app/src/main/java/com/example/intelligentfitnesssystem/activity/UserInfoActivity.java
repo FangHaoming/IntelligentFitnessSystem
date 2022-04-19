@@ -78,10 +78,8 @@ public class UserInfoActivity extends AppCompatActivity {
             } else if (user.getGender().equals("男")) {
                 drawable = ContextCompat.getDrawable(UserInfoActivity.this, R.drawable.male);
             }
-        } else {
-            drawable = ContextCompat.getDrawable(UserInfoActivity.this, R.drawable.unknown);
+            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
         }
-        drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
         binding.userName.setCompoundDrawables(null, null, drawable, null);
         binding.focusNum.setText(String.valueOf(user.getFocus().length));
         binding.followerNum.setText(String.valueOf(user.getFollowers().length));

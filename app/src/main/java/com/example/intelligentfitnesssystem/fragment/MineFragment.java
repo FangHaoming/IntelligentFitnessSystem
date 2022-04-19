@@ -125,10 +125,8 @@ public class MineFragment extends Fragment {
                 } else if (localUser.getGender().equals("男")) {
                     drawable = ContextCompat.getDrawable(requireContext(), R.drawable.male);
                 }
-            } else {
-                drawable = ContextCompat.getDrawable(requireContext(), R.drawable.unknown);
+                drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
             }
-            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
             binding.userName.setCompoundDrawables(null, null, drawable, null);
             binding.focusNum.setText(String.valueOf(localUser.getFocus().length));
             binding.followerNum.setText(String.valueOf(localUser.getFollowers().length));
