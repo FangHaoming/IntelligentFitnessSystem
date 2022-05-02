@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation project(':matisse')
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
@@ -56,4 +57,17 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.48'
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+    //mediapipe deps
+    implementation 'com.google.flogger:flogger:0.3.1'
+    implementation 'com.google.flogger:flogger-system-backend:0.3.1'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'com.google.guava:guava:27.0.1-android'
+    implementation 'com.google.guava:guava:27.0.1-android'
+    implementation 'com.google.protobuf:protobuf-java:3.11.4'
+    // CameraX core library
+    def camerax_version = "1.0.0-beta10"
+    implementation "androidx.camera:camera-core:$camerax_version"
+    implementation "androidx.camera:camera-camera2:$camerax_version"
+    implementation "androidx.camera:camera-lifecycle:$camerax_version"
+
 }

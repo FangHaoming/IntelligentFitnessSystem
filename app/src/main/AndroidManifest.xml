@@ -32,6 +32,14 @@
         android:theme="@style/Theme.IntelligentFitnessSystem"
         android:usesCleartextTraffic="true"
         tools:replace="android:theme,android:name">
+        <activity
+            android:name=".activity.MediapipeActivity"
+            android:exported="true"
+            android:screenOrientation="fullSensor">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
 
         <activity
             android:name=".MainActivity"
