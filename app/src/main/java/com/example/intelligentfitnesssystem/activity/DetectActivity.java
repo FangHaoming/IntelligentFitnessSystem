@@ -16,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +29,10 @@ import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.VideoFrame;
 import com.example.intelligentfitnesssystem.databinding.ActivityDetectBinding;
 import com.example.intelligentfitnesssystem.util.AppManager;
+import com.example.intelligentfitnesssystem.util.BitmapProvider;
+import com.example.intelligentfitnesssystem.util.FileUtils;
+import com.example.intelligentfitnesssystem.util.LoadingDialog;
+import com.example.intelligentfitnesssystem.util.MergyHandler;
 import com.example.intelligentfitnesssystem.util.OkSocketSendData;
 import com.example.intelligentfitnesssystem.util.Permission;
 import com.xuhao.didi.core.pojo.OriginalData;
@@ -38,6 +43,8 @@ import com.xuhao.didi.socket.client.sdk.client.OkSocketOptions;
 import com.xuhao.didi.socket.client.sdk.client.action.SocketActionAdapter;
 import com.xuhao.didi.socket.client.sdk.client.connection.IConnectionManager;
 import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.PermissionNo;
+import com.yanzhenjie.permission.PermissionYes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,6 +56,9 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import xyz.mylib.creator.handler.CreatorExecuteResponseHander;
+import xyz.mylib.creator.task.AvcExecuteAsyncTask;
+import xyz.mylib.creator.task.GIFExecuteAsyncTask;
 
 public class DetectActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 
@@ -59,6 +69,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
     public LinkedList<VideoFrame> videoFrameList = new LinkedList<>();
     private ActivityDetectBinding binding;
     private boolean isBegin = true;
+    private LoadingDialog mLoadingDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +81,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         holder = binding.sfv.getHolder();
+        mLoadingDialog = new LoadingDialog();
         //动作类型
         type = getIntent().getStringExtra("type");
 
@@ -123,7 +135,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         binding.download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO 合成视频并保存到本地
+                saveVideo();
             }
         });
     }
@@ -145,7 +157,6 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         ConnectionInfo info = new ConnectionInfo(host, port);
         //调用OkSocket，开启连接通道，拿到通道manager
         manager = OkSocket.open(info);
-        if (manager == null) return;
         //获取当前连接通道的参数配置对象
         OkSocketOptions options = manager.getOption();
         //基于当前参数配置对象构建一个参数配置builder类
@@ -176,7 +187,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                     @Override
                     public void run() {
                         try {
-                            if(!AppManager.isDestroy(DetectActivity.this)){
+                            if (!AppManager.isDestroy(DetectActivity.this)) {
                                 camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
                             }
                         } catch (RuntimeException e) {
@@ -188,10 +199,10 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         //获取相机支持的预览的大小
                         DisplayMetrics dm = getResources().getDisplayMetrics();
 //                        Camera.Size previewSize=getCameraPreviewSize(parameters);
-                        Camera.Size previewSize = getBestCameraResolution(parameters,getScreenMetrics(DetectActivity.this));
-                        int width=previewSize.width;
-                        int height=previewSize.height;
-                        System.out.println("*****w&h:"+width+" "+height);
+                        Camera.Size previewSize = getBestCameraResolution(parameters, getScreenMetrics(DetectActivity.this));
+                        int width = previewSize.width;
+                        int height = previewSize.height;
+                        System.out.println("*****w&h:" + width + " " + height);
 //                        int width = 640;
 //                        int height = 480;
 //                        int width =dm.widthPixels;// previewSizFe.width; //640
@@ -204,11 +215,11 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         parameters.setPreviewSize(width, height);
                         //相机旋转90度
                         if (manager != null) {
-                            camera.stopPreview();
+//                            camera.stopPreview();
                             camera.setDisplayOrientation(90);
                             //配置camera参数
                             camera.setParameters(parameters);
-                            camera.startPreview();
+//                            camera.startPreview();
                             try {
                                 camera.setPreviewDisplay(holder);
                             } catch (IOException e) {
@@ -262,7 +273,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(!AppManager.isDestroy(DetectActivity.this)){
+                        if (!AppManager.isDestroy(DetectActivity.this)) {
                             binding.iv.setImageBitmap(BitmapFactory.decodeByteArray(data.getBodyBytes(), 0, len)); //实时显示帧
                         }
                     }
@@ -305,6 +316,18 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 }
             }
         });
+    }
+
+    /**
+     * 保存解析后的视频到本地
+     */
+    void saveVideo() {
+        mLoadingDialog.show(getSupportFragmentManager());
+        String name = FileUtils.sha1String(videoFrameList.get(0).getData()) + ".mp4";
+        String path = getApplicationContext().getFilesDir().getAbsolutePath();
+        String dpath = getFileStreamPath(name).getPath();
+        CreatorExecuteResponseHander handler = new MergyHandler(mLoadingDialog, dpath, path + "/" + name);
+        AvcExecuteAsyncTask.execute(new BitmapProvider(videoFrameList), 16, handler, dpath);
     }
 
     /**
@@ -412,6 +435,16 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
     public static Point getScreenMetrics(Context context) {
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         return new Point(dm.widthPixels, dm.heightPixels);
+    }
+
+    @PermissionYes(300)
+    private void getPermissionYes(List<String> grantedPermissions) {
+
+    }
+
+    @PermissionNo(300)
+    private void getPermissionNo(List<String> deniedPermissions) {
+
     }
 
 

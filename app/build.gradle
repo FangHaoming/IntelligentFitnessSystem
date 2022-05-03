@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.github.xiaoyifan6:videocreator:1.0.1'
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation project(':matisse')
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'

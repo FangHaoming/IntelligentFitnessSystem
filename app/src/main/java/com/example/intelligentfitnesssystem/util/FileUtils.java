@@ -97,4 +97,37 @@ public class FileUtils {
             return null;
         }
     }
+
+    /**
+     * 复制文件夹及其中的文件
+     *
+     * @param oldPath String 原文件夹路径 如：data/user/0/com.test/files
+     * @param newPath String 复制后的路径 如：data/user/0/com.test/cache
+     * @return <code>true</code> if and only if the directory and files were copied;
+     * <code>false</code> otherwise
+     */
+    public static boolean copyFile(String oldPath, String newPath) {
+        try {
+            File newFile = new File(newPath);
+            File oldFile = new File(oldPath);
+
+            String[] files = oldFile.list();
+            File temp;
+
+            FileInputStream fileInputStream = new FileInputStream(oldFile);
+            FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+            byte[] buffer = new byte[1024];
+            int byteRead;
+            while ((byteRead = fileInputStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, byteRead);
+            }
+            fileInputStream.close();
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

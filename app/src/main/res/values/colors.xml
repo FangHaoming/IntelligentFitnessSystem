@@ -20,5 +20,6 @@
     <color name="share_background">#D0F3EDED</color>
     <color name="bottom_dialog_btn">#8BECFF</color>
     <color name="bottom_dialog_cancel">#808BECFF</color>
+    <color name="gray1">#444444</color>
 
 </resources>
