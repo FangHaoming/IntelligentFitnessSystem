@@ -48,6 +48,7 @@ import com.yanzhenjie.permission.PermissionYes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.List;
@@ -107,7 +108,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 if (isBegin) {
                     //record
                     binding.sfv.setVisibility(View.VISIBLE);
-                    initOkSocket("172.16.11.16", 8004, type);
+                    initOkSocket("172.16.7.13", 8004, type);
                     manager.connect();
 //                    requestSocket(type);
                     binding.switchBtn.setImageResource(R.drawable.stop);
@@ -176,13 +177,19 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         });
         //创建一个新的参数配置对象并且设置给连接通道
         manager.option(builder.build());
+        manager.registerReceiver(new SocketActionAdapter() {
+            @Override
+            public void onSocketConnectionFailed(ConnectionInfo info, String action, Exception e) {
+                super.onSocketConnectionFailed(info, action, e);
+                System.out.println("*****Socket fail:" + e);
+            }
+        });
         //注册Socket连接成功监听器
         manager.registerReceiver(new SocketActionAdapter() {
             @Override
             public void onSocketConnectionSuccess(ConnectionInfo info, String action) {
                 super.onSocketConnectionSuccess(info, action);
                 System.out.println("*****Socket connected");
-                if (manager == null) return;
                 new Thread(new Runnable() {
                     @Override
                     public void run() {

@@ -15,6 +15,13 @@ public class User implements Serializable {
     private User[] focus;
     private User[] followers;
 
+    public User(int id) {
+        this.id = id;
+    }
+    public User(){
+
+    }
+
     public Article[] getArticles() {
         return articles;
     }

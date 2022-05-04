@@ -45,6 +45,6 @@ public class MergyHandler implements CreatorExecuteResponseHander {
         if (dfile.exists()) {
             dfile.delete();
         }
-        FileUtils.copyFile(sPath, dPath);
+//        FileUtils.copyFile(sPath, dPath);
     }
 }

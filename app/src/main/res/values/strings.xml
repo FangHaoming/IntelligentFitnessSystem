@@ -78,4 +78,5 @@
     <string name="mis_permission_dialog_cancel">拒绝</string>
     <string name="mis_permission_rationale_write_storage">需要您提供写/读存储权限</string>
 
+    <string name="comment_count">条回复</string>
 </resources>

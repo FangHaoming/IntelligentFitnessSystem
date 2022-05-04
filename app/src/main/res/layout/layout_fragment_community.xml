@@ -12,6 +12,7 @@
         android:orientation="horizontal"
         android:paddingHorizontal="5dp"
         android:paddingVertical="10dp"
+        android:background="@color/bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 

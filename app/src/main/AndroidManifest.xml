@@ -108,6 +108,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity
+            android:name=".activity.ChildCommentActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.ArticleDetailActivity" />
+        </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.fileprovider"

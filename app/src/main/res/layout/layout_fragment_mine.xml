@@ -115,6 +115,18 @@
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
+            <Button
+                android:id="@+id/focus"
+                android:layout_width="60dp"
+                android:layout_height="30dp"
+                android:background="@drawable/oval"
+                android:text="@string/focus"
+                android:visibility="gone"
+                app:layout_constraintStart_toEndOf="@+id/data_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/text_normal" />
 
             <TextView
                 android:id="@+id/userName"
@@ -140,6 +152,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/userName" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -204,6 +204,23 @@ public class Http {
         return context.getResources().getString(R.string.status_server_error);
     }
 
+    public static String getChildComment(Context context, int commentId) throws IOException {
+        String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_release_article);
+        String url = path + "/comments/" + commentId + "/subComment";
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("token", local_sp.getString("token", ""))
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        Response response = call.execute();
+        if (response.isSuccessful()) {
+            return Objects.requireNonNull(response.body()).string();
+        }
+        return context.getResources().getString(R.string.status_server_error);
+    }
+
     public static String getUserInfo(Context context, String phone) throws IOException {
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_register);
         String url = path + "/" + phone;

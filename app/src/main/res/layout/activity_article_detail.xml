@@ -10,6 +10,7 @@
         android:id="@+id/head_area"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/bar"
         android:layout_height="50dp">
         <TextView
             android:layout_width="20dp"
@@ -102,6 +103,7 @@
                         android:layout_width="60dp"
                         android:layout_height="30dp"
                         android:background="@drawable/oval"
+                        android:visibility="gone"
                         android:text="@string/focus"
                         android:textColor="@color/text_normal" />
                 </LinearLayout>
@@ -117,32 +119,98 @@
                 android:textSize="20sp" />
 
             <LinearLayout
-                android:id="@+id/content_images"
                 android:layout_width="match_parent"
-                android:visibility="gone"
+                android:background="@color/bar"
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/image_0"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="2dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/user_img" />
-
-                <ImageView
                     android:id="@+id/image_1"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="2dp"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
                     android:layout_weight="1"
                     android:src="@drawable/user_img" />
 
                 <ImageView
                     android:id="@+id/image_2"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="2dp"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/user_img" />
+
+                <ImageView
+                    android:id="@+id/image_3"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/user_img" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:background="@color/bar"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_4"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/user_img" />
+
+                <ImageView
+                    android:id="@+id/image_5"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/user_img" />
+
+                <ImageView
+                    android:id="@+id/image_6"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/user_img" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:background="@color/bar"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_7"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/user_img" />
+
+                <ImageView
+                    android:id="@+id/image_8"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/user_img" />
+
+                <ImageView
+                    android:id="@+id/image_9"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_margin="2dp"
                     android:layout_weight="1"
                     android:src="@drawable/user_img" />
             </LinearLayout>
@@ -152,6 +220,45 @@
                 android:layout_width="match_parent"
                 android:visibility="gone"
                 android:layout_height="200dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="horizontal"
+                android:background="@color/share_background"
+                android:layout_marginHorizontal="10dp"
+                android:visibility="gone"
+                android:id="@+id/share">
+                <ImageView
+                    android:layout_width="110dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/share_img"
+                    android:src="@drawable/user_img"
+                    android:background="@color/white"
+                    android:paddingEnd="10dp"
+                    tools:ignore="RtlSymmetry" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="10dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textColor="@color/text_selected"
+                        android:id="@+id/share_nickname"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textColor="@color/text_normal"
+                        android:visibility="gone"
+                        android:id="@+id/share_text"/>
+                </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

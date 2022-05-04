@@ -25,6 +25,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.activity.ArticleDetailActivity;
+import com.example.intelligentfitnesssystem.activity.ChildCommentActivity;
 import com.example.intelligentfitnesssystem.activity.ReleaseArticleActivity;
 import com.example.intelligentfitnesssystem.bean.Article;
 import com.example.intelligentfitnesssystem.bean.Comment;
@@ -90,20 +91,22 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (holder instanceof ListViewHolder) {
             int safePosition = holder.getBindingAdapterPosition();
             Comment comment = list.get(safePosition);
+            ListViewHolder listViewHolder = (ListViewHolder) holder;
+            if (!isShowCommentBtn) listViewHolder.comment.setVisibility(View.GONE);
             if (comment.getPublisherImg() != null) {
-                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + comment.getPublisherImg()).into(((ListViewHolder) holder).head);
+                Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + comment.getPublisherImg()).into(listViewHolder.head);
             }
-            ((ListViewHolder) holder).nickname.setText(String.valueOf(comment.getPublisherName()));
-            ((ListViewHolder) holder).createTime.setText(comment.getCreateTime());
-            ((ListViewHolder) holder).content_text.setText(comment.getContent());
+            listViewHolder.nickname.setText(String.valueOf(comment.getPublisherName()));
+            listViewHolder.createTime.setText(comment.getCreateTime());
+            listViewHolder.content_text.setText(comment.getContent());
 
             int[] temp = comment.getLikeId();
             sort(temp);
             final boolean[] isPraise = {-1 != binarySearch(temp, localUser.getId())};
             if (isPraise[0]) {
-                ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
             }
-            ((ListViewHolder) holder).praise.setOnClickListener(new View.OnClickListener() {
+            listViewHolder.praise.setOnClickListener(new View.OnClickListener() {
                 @SuppressLint("UseCompatLoadingForDrawables")
                 @Override
                 public void onClick(View v) {
@@ -114,9 +117,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                 try {
                                     MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(mContext, comment.getId()), (Type) MyResponse.class);
                                     if (result != null && result.getStatus() == 0) {
-                                        ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise));
+                                        listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise));
                                         comment.setLikeCount(comment.getLikeCount() - 1);
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(comment.getLikeCount()));
+                                        listViewHolder.praise_num.setText(String.valueOf(comment.getLikeCount()));
                                         isPraise[0] = false;
                                     }
                                 } catch (IOException e) {
@@ -131,9 +134,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                 try {
                                     MyResponse<Object> result = JSON.parseObject(Http.praiseComment(mContext, comment.getId()), (Type) MyResponse.class);
                                     if (result != null && result.getStatus() == 0) {
-                                        ((ListViewHolder) holder).praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
+                                        listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
                                         comment.setLikeCount(comment.getLikeCount() + 1);
-                                        ((ListViewHolder) holder).praise_num.setText(String.valueOf(comment.getLikeCount()));
+                                        listViewHolder.praise_num.setText(String.valueOf(comment.getLikeCount()));
                                         isPraise[0] = true;
                                     }
                                 } catch (IOException e) {
@@ -144,10 +147,8 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     }
                 }
             });
-            ((ListViewHolder) holder).praise_num.setText(String.valueOf(comment.getLikeCount()));
-
-            if (!isShowCommentBtn) ((ListViewHolder) holder).comment.setVisibility(View.GONE);
-            ((ListViewHolder) holder).comment.setOnClickListener(new View.OnClickListener() {
+            listViewHolder.praise_num.setText(String.valueOf(comment.getLikeCount()));
+            listViewHolder.comment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (et != null) {
@@ -160,9 +161,17 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
             if (comment.getCommentCount() > 0) {
-                ((ListViewHolder) holder).comment_num.setText("查看全部" + comment.getCommentCount() + "条回复");
+                listViewHolder.comment_num.setText("查看全部" + comment.getCommentCount() + "条回复");
+                listViewHolder.comment_num.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext, ChildCommentActivity.class);
+                        intent.putExtra("commentId", comment.getId());
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                });
             }
-
         }
     }
 

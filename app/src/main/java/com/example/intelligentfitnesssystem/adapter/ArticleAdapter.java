@@ -78,7 +78,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return new ListViewHolder(view);
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (holder instanceof ListViewHolder) {
@@ -88,6 +88,22 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             Article article = list.get(safePosition);
             ListViewHolder listViewHolder = (ListViewHolder) holder;
             if (article != null) {
+                if (article.getIsShare() == 1) {
+                    listViewHolder.share.setVisibility(View.VISIBLE);
+                    Article shareArticle = article.getShareArticle();
+                    if (shareArticle.getImg().length > 0 && !shareArticle.getImg()[0].split("\\.")[1].equals("mp4")) {
+                        Glide.with(mContext).load(mContext.getString(R.string.baseUrl) + mContext.getString(R.string.api_get_img) + mContext.getString(R.string.api_get_articleImg) + shareArticle.getImg()[0]).into(listViewHolder.shareImg);
+                    } else if (shareArticle.getPublisherImg() != null) {
+                        Glide.with(mContext).load(mContext.getString(R.string.baseUrl) + mContext.getString(R.string.api_get_img) + shareArticle.getPublisherImg()).into(listViewHolder.shareImg);
+                    }
+                    if (shareArticle.getText() != null && !shareArticle.getText().equals("")) {
+                        listViewHolder.shareText.setVisibility(View.VISIBLE);
+                        listViewHolder.shareText.setText(shareArticle.getText());
+                        listViewHolder.shareNickname.setText(shareArticle.getPublisherName());
+                    } else {
+                        listViewHolder.shareNickname.setText(shareArticle.getPublisherName() + "分享的动态");
+                    }
+                }
                 if (article.getPublisherImg() != null) {
                     listViewHolder.head.setTag(safePosition);
                     Glide.with(mContext)
@@ -103,7 +119,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             public void run() {
                                 try {
                                     MyResponse<User> result = JSON.parseObject(Http.getUserInfo(mContext, article.getUserId()), (Type) MyResponse.class);
-                                    if (result.getStatus() == 0) {
+                                    if (result != null && result.getStatus() == 0) {
                                         Intent intent = new Intent(mContext, UserInfoActivity.class);
                                         intent.putExtra("User", JSON.toJSONString(result.getData()));
                                         mContext.startActivity(intent);
@@ -117,64 +133,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 });
                 listViewHolder.nickname.setText(String.valueOf(article.getPublisherName()));
                 listViewHolder.createTime.setText(article.getCreateTime());
-                for (User user : localUser.getFocus()) {
-                    if (user.getId() == article.getUserId()) {
-                        isFocus = true;
-                        focusedUser = user;
-                    }
-                }
-                if (isFocus) {
-                    listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
-                }
-                listViewHolder.focus.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!isFocus) {
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                MyResponse<Object> result = JSON.parseObject(Http.followUser(mContext, article.getUserId()), (Type) MyResponse.class);
-                                                if (result != null && result.getStatus() == 0) {
-                                                    listViewHolder.focus.setText(mContext.getResources().getString(R.string.focused));
-
-                                                } else {
-                                                    Looper.prepare();
-                                                    Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
-                                                    Looper.loop();
-                                                }
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }).start();
-                                } else {
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(mContext, article.getUserId()), (Type) MyResponse.class);
-                                                if (result != null && result.getStatus() == 0) {
-                                                    listViewHolder.focus.setText(mContext.getResources().getString(R.string.focus));
-                                                } else {
-                                                    Looper.prepare();
-                                                    Toast.makeText(mContext, mContext.getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
-                                                    Looper.loop();
-                                                }
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }).start();
-                                }
-                            }
-                        }).start();
-
-                    }
-                });
                 if (article.getText() != null && !article.getText().equals("")) {
                     listViewHolder.content_text.setVisibility(View.VISIBLE);
                     listViewHolder.content_text.setText(article.getText());
@@ -187,15 +145,15 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                 .placeholder(R.drawable.img_preview)
                                 .into(listViewHolder.img_0);
                     }
-//                if (article.getImg().length > 1 && article.getImg()[1] != null) {
-//                    listViewHolder.img_1.setVisibility(View.VISIBLE);
-//                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[1]).into(listViewHolder.img_1);
-//
-//                }
-//                if (article.getImg().length > 2 && article.getImg()[2] != null) {
-//                    listViewHolder.img_2.setVisibility(View.VISIBLE);
-//                    Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[2]).into(listViewHolder.img_2);
-//                }
+                    if (article.getImg().length > 1 && article.getImg()[1] != null) {
+                        listViewHolder.img_1.setVisibility(View.VISIBLE);
+                        Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[1]).into(listViewHolder.img_1);
+
+                    }
+                    if (article.getImg().length > 2 && article.getImg()[2] != null) {
+                        listViewHolder.img_2.setVisibility(View.VISIBLE);
+                        Glide.with(mContext).load(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[2]).into(listViewHolder.img_2);
+                    }
                 }
                 if (article.getImg().length == 1 && article.getImg()[0].split("\\.")[1].equals("mp4")) {
                     if (listViewHolder.video.getTag() != null && !listViewHolder.video.getTag().equals(article.getImg()[0])) {
@@ -289,7 +247,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         super.onViewRecycled(holder);
         if (holder instanceof ListViewHolder) {
             ListViewHolder listViewHolder = (ListViewHolder) holder;
-            Glide.with(mContext).clear(listViewHolder.img_0);
         }
     }
 
@@ -314,6 +271,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView comment_num;
         Button transport;
         LinearLayout content;
+        LinearLayout share;
+        ImageView shareImg;
+        TextView shareNickname;
+        TextView shareText;
 
         public ListViewHolder(View itemView) {
             super(itemView);
@@ -332,6 +293,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             comment_num = itemView.findViewById(R.id.comment_num);
             transport = itemView.findViewById(R.id.transport);
             content = itemView.findViewById(R.id.content);
+            share = itemView.findViewById(R.id.share);
+            shareImg = itemView.findViewById(R.id.share_img);
+            shareNickname = itemView.findViewById(R.id.share_nickname);
+            shareText = itemView.findViewById(R.id.share_text);
         }
     }
 }

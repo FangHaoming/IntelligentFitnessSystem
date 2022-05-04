@@ -140,12 +140,24 @@ public class ReleaseArticleActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                binding.releaseBtn.setEnabled(false);
+                            }
+                        });
                         MyResponse<Article> result = null;
                         try {
                             result = JSON.parseObject(Http.commitArticle(ReleaseArticleActivity.this, paramsArticle), (java.lang.reflect.Type) MyResponse.class);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                binding.releaseBtn.setEnabled(true);
+                            }
+                        });
                         System.out.println("*****release req" + JSON.toJSONString(paramsArticle));
                         System.out.println("*****release res" + JSON.toJSONString(result));
                         if (result != null && result.getStatus() == 0) {
@@ -154,7 +166,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
                             intent.putExtra("newArticle", JSON.toJSONString(newArticle));
                             startActivity(intent);
                             finish();
-                        } else {
+                        } else if (result != null) {
                             Looper.prepare();
                             Toast.makeText(ReleaseArticleActivity.this, result.getMsg(), Toast.LENGTH_SHORT).show();
                             Looper.loop();
