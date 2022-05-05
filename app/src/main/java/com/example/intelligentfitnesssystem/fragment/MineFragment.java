@@ -16,13 +16,21 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.alibaba.fastjson.JSON;
 import com.bumptech.glide.Glide;
 import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.activity.LoginActivity;
 import com.example.intelligentfitnesssystem.activity.ModifyInfoActivity;
+import com.example.intelligentfitnesssystem.adapter.MineArticleAdapter;
+import com.example.intelligentfitnesssystem.adapter.MineUserAdapter;
+import com.example.intelligentfitnesssystem.bean.Article;
+import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.databinding.LayoutFragmentMineBinding;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static com.example.intelligentfitnesssystem.MyApplication.global_sp;
@@ -34,6 +42,8 @@ public class MineFragment extends Fragment {
 
     private LayoutFragmentMineBinding binding;
     private TextView current;
+    private MineArticleAdapter mineArticleAdapter;
+    private MineUserAdapter mineUserAdapter;
 
     @Nullable
     @Override
@@ -66,18 +76,35 @@ public class MineFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 switchTab(binding.articleBtn);
+                binding.userRv.setVisibility(View.GONE);
+                binding.articleRv.setVisibility(View.VISIBLE);
+                mineArticleAdapter = new MineArticleAdapter(requireContext(), new ArrayList<Article>(Arrays.asList(localUser.getArticles())));
+                binding.articleRv.setLayoutManager(new LinearLayoutManager(requireContext()));
+                binding.articleRv.setAdapter(mineArticleAdapter);
             }
         });
         binding.focusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchTab(binding.focusBtn);
+                binding.userRv.setVisibility(View.VISIBLE);
+                binding.articleRv.setVisibility(View.GONE);
+                System.out.println("*****getFoc"+ JSON.toJSONString(localUser.getFocus()));
+                mineUserAdapter = new MineUserAdapter(requireContext(), new ArrayList<User>(Arrays.asList(localUser.getFocus())));
+                binding.userRv.setLayoutManager(new LinearLayoutManager(requireContext()));
+                binding.userRv.setAdapter(mineUserAdapter);
             }
         });
         binding.followerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchTab(binding.followerBtn);
+                binding.userRv.setVisibility(View.VISIBLE);
+                binding.articleRv.setVisibility(View.GONE);
+                System.out.println("*****getFol"+JSON.toJSONString(localUser.getFollowers()));
+                mineUserAdapter = new MineUserAdapter(requireContext(), new ArrayList<User>(Arrays.asList(localUser.getFollowers())));
+                binding.userRv.setLayoutManager(new LinearLayoutManager(requireContext()));
+                binding.userRv.setAdapter(mineUserAdapter);
             }
         });
         return view;
@@ -103,6 +130,7 @@ public class MineFragment extends Fragment {
         current.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
         current.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_selected));
     }
+
 
     private void checkIsLogin() {
         if (!isLogin) {

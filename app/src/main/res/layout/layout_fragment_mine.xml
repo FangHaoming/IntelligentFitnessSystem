@@ -202,6 +202,7 @@
             android:id="@+id/article_rv"
             android:layout_width="match_parent"
             android:padding="10dp"
+            android:visibility="gone"
             android:layout_height="match_parent" />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/user_rv"
