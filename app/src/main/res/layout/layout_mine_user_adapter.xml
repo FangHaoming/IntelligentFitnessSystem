@@ -32,22 +32,6 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginLeft="5dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/fans_num"
-            android:text="粉丝数："/>
-        <TextView
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:text="0"
-            android:id="@+id/fans_num"
-            android:layout_marginRight="10dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

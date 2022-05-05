@@ -29,9 +29,6 @@ public class MineUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private Context mContext;
     private List<User> list;
-    private boolean isFocus = false;
-    private boolean isPraise = false;
-    private User focusedUser = new User();
 
     public MineUserAdapter(Context mContext, List<User> list) {
         this.mContext = mContext;
@@ -60,13 +57,11 @@ public class MineUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ListViewHolder listViewHolder = (ListViewHolder) holder;
             if (user != null) {
                 Glide.with(mContext).load(mContext.getString(R.string.baseUrl) + mContext.getString(R.string.api_get_img) + user.getImg()).into(listViewHolder.head);
-                if (user.getFollowers() != null && user.getFollowers().length > 0) {
-                    listViewHolder.fans_num.setText(String.valueOf(user.getFollowers().length));
-                }
                 listViewHolder.nickname.setText(user.getNickname());
                 listViewHolder.container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        System.out.println("*****mineUser" + JSON.toJSONString(user));
                         Intent intent = new Intent(mContext.getApplicationContext(), UserInfoActivity.class);
                         intent.putExtra("User", JSON.toJSONString(user));
                         mContext.startActivity(intent);
@@ -92,14 +87,12 @@ public class MineUserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public static class ListViewHolder extends RecyclerView.ViewHolder {
         CircleImageView head;
         TextView nickname;
-        TextView fans_num;
         ConstraintLayout container;
 
         public ListViewHolder(View itemView) {
             super(itemView);
             head = itemView.findViewById(R.id.head);
             nickname = itemView.findViewById(R.id.nickname);
-            fans_num = itemView.findViewById(R.id.fans_num);
             container = itemView.findViewById(R.id.container);
 
         }

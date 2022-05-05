@@ -44,6 +44,7 @@ public class MineFragment extends Fragment {
     private TextView current;
     private MineArticleAdapter mineArticleAdapter;
     private MineUserAdapter mineUserAdapter;
+    private boolean isArticle = true;
 
     @Nullable
     @Override
@@ -81,6 +82,7 @@ public class MineFragment extends Fragment {
                 mineArticleAdapter = new MineArticleAdapter(requireContext(), new ArrayList<Article>(Arrays.asList(localUser.getArticles())));
                 binding.articleRv.setLayoutManager(new LinearLayoutManager(requireContext()));
                 binding.articleRv.setAdapter(mineArticleAdapter);
+                isArticle = true;
             }
         });
         binding.focusBtn.setOnClickListener(new View.OnClickListener() {
@@ -89,10 +91,10 @@ public class MineFragment extends Fragment {
                 switchTab(binding.focusBtn);
                 binding.userRv.setVisibility(View.VISIBLE);
                 binding.articleRv.setVisibility(View.GONE);
-                System.out.println("*****getFoc"+ JSON.toJSONString(localUser.getFocus()));
                 mineUserAdapter = new MineUserAdapter(requireContext(), new ArrayList<User>(Arrays.asList(localUser.getFocus())));
                 binding.userRv.setLayoutManager(new LinearLayoutManager(requireContext()));
                 binding.userRv.setAdapter(mineUserAdapter);
+                isArticle = false;
             }
         });
         binding.followerBtn.setOnClickListener(new View.OnClickListener() {
@@ -101,10 +103,10 @@ public class MineFragment extends Fragment {
                 switchTab(binding.followerBtn);
                 binding.userRv.setVisibility(View.VISIBLE);
                 binding.articleRv.setVisibility(View.GONE);
-                System.out.println("*****getFol"+JSON.toJSONString(localUser.getFollowers()));
                 mineUserAdapter = new MineUserAdapter(requireContext(), new ArrayList<User>(Arrays.asList(localUser.getFollowers())));
                 binding.userRv.setLayoutManager(new LinearLayoutManager(requireContext()));
                 binding.userRv.setAdapter(mineUserAdapter);
+                isArticle = false;
             }
         });
         return view;
@@ -140,7 +142,13 @@ public class MineFragment extends Fragment {
     }
 
     private void initView() {
-        System.out.println("*****user_img:" + localUser.getImg());
+        if(isArticle){
+            binding.userRv.setVisibility(View.GONE);
+            binding.articleRv.setVisibility(View.VISIBLE);
+            mineArticleAdapter = new MineArticleAdapter(requireContext(), new ArrayList<Article>(Arrays.asList(localUser.getArticles())));
+            binding.articleRv.setLayoutManager(new LinearLayoutManager(requireContext()));
+            binding.articleRv.setAdapter(mineArticleAdapter);
+        }
         if (isLogin) {
             if (localUser.getImg() != null && !localUser.getImg().equals("")) {
                 Glide.with(requireContext()).load(requireContext().getResources().getString(R.string.baseUrl) + requireContext().getResources().getString(R.string.api_get_img) + localUser.getImg()).into(binding.userImg);

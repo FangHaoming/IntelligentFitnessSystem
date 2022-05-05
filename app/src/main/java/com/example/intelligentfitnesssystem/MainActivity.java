@@ -17,6 +17,7 @@ import com.example.intelligentfitnesssystem.fragment.MineFragment;
 
 import static com.example.intelligentfitnesssystem.MyApplication.setTabHost;
 import static com.example.intelligentfitnesssystem.MyApplication.initApp;
+import static com.example.intelligentfitnesssystem.MyApplication.updateUser;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -55,5 +56,12 @@ public class MainActivity extends AppCompatActivity {
         tabImage.setImageResource(selectorImg[index]); // 通过selector来控制图片的改变
         tabTitle.setText(tabs[index]);// 通过selector来控制文字颜色的改变
         return inflate;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("*****Main resume");
+        updateUser(MainActivity.this);
     }
 }

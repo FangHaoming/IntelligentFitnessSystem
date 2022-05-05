@@ -57,9 +57,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private Context mContext;
     private List<Article> list;
-    private boolean isFocus = false;
     private boolean isPraise = false;
-    private User focusedUser = new User();
 
     public ArticleAdapter(Context mContext, List<Article> list) {
         this.mContext = mContext;
@@ -164,56 +162,16 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     listViewHolder.video.bind(mContext.getResources().getString(R.string.baseUrl) + mContext.getResources().getString(R.string.api_get_img) + mContext.getResources().getString(R.string.api_get_articleImg) + article.getImg()[0]);
                 }
                 System.out.println("*****position:" + safePosition + "  " + adapterPosition + " " + listViewHolder.video.getTag() + " " + Arrays.toString(article.getImg()));
-                int[] temp = article.getLikeId();
-                sort(temp);
-                isPraise = -1 != binarySearch(temp, localUser.getId());
-                if (isPraise) {
-                    listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
-                }
-                listViewHolder.praise.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("UseCompatLoadingForDrawables")
-                    @Override
-                    public void onClick(View v) {
-                        if (isPraise) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(mContext, article.getId()), (Type) MyResponse.class);
-                                        if (result != null && result.getStatus() == 0) {
-                                            listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise));
-                                            article.setLikeCount(article.getLikeCount() - 1);
-                                            listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
-                                            isPraise = false;
-
-                                        }
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }).start();
-                        } else {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(mContext, article.getId()), (Type) MyResponse.class);
-                                        if (result != null && result.getStatus() == 0) {
-                                            listViewHolder.praise.setBackground(mContext.getDrawable(R.drawable.praise_clicked));
-                                            article.setLikeCount(article.getLikeCount() + 1);
-                                            listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
-                                            isPraise = true;
-                                        }
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }).start();
-                        }
-                    }
-                });
                 listViewHolder.praise_num.setText(String.valueOf(article.getLikeCount()));
                 listViewHolder.content.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);
+                        intent.putExtra("Article", JSON.toJSONString(article));
+                        mContext.startActivity(intent);
+                    }
+                });
+                listViewHolder.praise.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(mContext.getApplicationContext(), ArticleDetailActivity.class);

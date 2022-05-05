@@ -149,7 +149,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
                             }
                         } else {
                             try {
-                                MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(ArticleDetailActivity.this,  article.getUserId()), (Type) MyResponse.class);
+                                MyResponse<Object> result = JSON.parseObject(Http.unFollowUser(ArticleDetailActivity.this, article.getUserId()), (Type) MyResponse.class);
                                 if (result != null && result.getStatus() == 0) {
                                     binding.focus.setText(getString(R.string.focus));
                                     List<User> list = new ArrayList<User>(Arrays.asList(localUser.getFocus()));
@@ -195,41 +195,32 @@ public class ArticleDetailActivity extends AppCompatActivity {
         binding.praise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isPraise) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseComment(ArticleDetailActivity.this, article.getId()), (Type) MyResponse.class);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (isPraise) {
+                                MyResponse<Object> result = JSON.parseObject(Http.cancelPraiseArticle(ArticleDetailActivity.this, article.getId()), (Type) MyResponse.class);
                                 if (result != null && result.getStatus() == 0) {
                                     binding.praise.setBackground(ContextCompat.getDrawable(ArticleDetailActivity.this, R.drawable.praise));
                                     article.setLikeCount(article.getLikeCount() - 1);
                                     binding.praiseNum.setText(String.valueOf(article.getLikeCount()));
                                     isPraise = false;
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
-                } else {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                MyResponse<Object> result = JSON.parseObject(Http.praiseComment(ArticleDetailActivity.this, article.getId()), (Type) MyResponse.class);
+                            } else {
+                                MyResponse<Object> result = JSON.parseObject(Http.praiseArticle(ArticleDetailActivity.this, article.getId()), (Type) MyResponse.class);
                                 if (result != null && result.getStatus() == 0) {
                                     binding.praise.setBackground(ContextCompat.getDrawable(ArticleDetailActivity.this, R.drawable.praise_clicked));
                                     article.setLikeCount(article.getLikeCount() + 1);
                                     binding.praiseNum.setText(String.valueOf(article.getLikeCount()));
                                     isPraise = true;
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
                             }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    }).start();
-                }
+                    }
+                }).start();
             }
         });
         binding.comment.setOnClickListener(new View.OnClickListener() {
