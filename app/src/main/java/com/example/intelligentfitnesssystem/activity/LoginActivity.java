@@ -39,6 +39,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
 
+    /**
+     * @param savedInstanceState
+     */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,28 +54,15 @@ public class LoginActivity extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.white));
         window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        AppManager.addActivity(this);
 
         binding.registerBtn.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         binding.registerBtn.getPaint().setAntiAlias(true);
-
-
-        if (global_sp.getBoolean("isRemember", false)) {
-            binding.phone.setText(localUser.getPhone());
-            binding.pwd.setText(localUser.getPwdHex());
-            binding.loginBtn.setEnabled(true);
-            binding.checkPwd.setChecked(true);
-        } else {
-            EditIsCanUseBtnUtils.getInstance()
-                    .addContext(this)
-                    .addEdittext(binding.phone)
-                    .addEdittext(binding.pwd)
-                    .setBtn(binding.loginBtn)
-                    .build();
-        }
-        if (global_sp.getBoolean("isAuto", false)) {
-            binding.checkAuto.setChecked(true);
-        }
+        EditIsCanUseBtnUtils.getInstance()
+                .addContext(this)
+                .addEdittext(binding.phone)
+                .addEdittext(binding.pwd)
+                .setBtn(binding.loginBtn)
+                .build();
         binding.backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,18 +112,8 @@ public class LoginActivity extends AppCompatActivity {
                 JSONObject data = (JSONObject) result.get("data");
                 switch (result.getInteger("status")) {
                     case 0:
-                        System.out.println("*****login res:"+JSON.toJSONString(data));
+                        System.out.println("*****login res:" + JSON.toJSONString(data));
                         assert data != null;
-                        if (binding.checkPwd.isChecked()) {
-                            global_editor.putBoolean("isRemember", true);
-                        } else {
-                            global_editor.putBoolean("isRemember", false);
-                        }
-                        if (binding.checkAuto.isChecked()) {
-                            global_editor.putBoolean("isAuto", true);
-                        } else {
-                            global_editor.putBoolean("isAuto", false);
-                        }
                         localUser = (User) JSONObject.parseObject(data.toJSONString(), User.class);
                         local_editor.putString("token", result.getString("token"));
                         local_editor.putString("localUser", data.toJSONString());
@@ -172,7 +152,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            AppManager.AppExit(this);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, R.anim.slide_right_out);
+            finish();
         }
         return true;
     }

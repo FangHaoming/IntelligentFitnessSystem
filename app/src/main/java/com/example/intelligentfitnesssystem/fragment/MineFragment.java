@@ -113,6 +113,11 @@ public class MineFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         initView();
@@ -142,7 +147,7 @@ public class MineFragment extends Fragment {
     }
 
     private void initView() {
-        if(isArticle){
+        if(isArticle && isLogin){
             binding.userRv.setVisibility(View.GONE);
             binding.articleRv.setVisibility(View.VISIBLE);
             mineArticleAdapter = new MineArticleAdapter(requireContext(), new ArrayList<Article>(Arrays.asList(localUser.getArticles())));

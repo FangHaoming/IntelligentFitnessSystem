@@ -64,7 +64,7 @@ import xyz.mylib.creator.task.GIFExecuteAsyncTask;
 public class DetectActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 
     public String type;
-    public Camera camera;
+    public Camera CAMERA;
     public SurfaceHolder holder;
     public IConnectionManager manager;
     public LinkedList<VideoFrame> videoFrameList = new LinkedList<>();
@@ -108,7 +108,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 if (isBegin) {
                     //record
                     binding.sfv.setVisibility(View.VISIBLE);
-                    initOkSocket("172.16.7.13", 8004, type);
+                    initOkSocket("172.16.179.141", 8004, type);
                     manager.connect();
 //                    requestSocket(type);
                     binding.switchBtn.setImageResource(R.drawable.stop);
@@ -122,7 +122,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         manager.disconnect();
                     }
 //                    binding.iv.setImageBitmap(null);
-                    camera = null;
+                    CAMERA = null;
                     manager.disconnect();
                     manager = null;
                     binding.sfv.setVisibility(View.GONE);
@@ -191,18 +191,21 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 super.onSocketConnectionSuccess(info, action);
                 System.out.println("*****Socket connected");
                 new Thread(new Runnable() {
+                    /**
+                     *
+                     */
                     @Override
                     public void run() {
                         try {
                             if (!AppManager.isDestroy(DetectActivity.this)) {
-                                camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+                                CAMERA = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
                             }
                         } catch (RuntimeException e) {
                             e.printStackTrace();
                         }
 
                         //获取相机参数
-                        Camera.Parameters parameters = camera.getParameters();
+                        Camera.Parameters parameters = CAMERA.getParameters();
                         //获取相机支持的预览的大小
                         DisplayMetrics dm = getResources().getDisplayMetrics();
 //                        Camera.Size previewSize=getCameraPreviewSize(parameters);
@@ -222,13 +225,13 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         parameters.setPreviewSize(width, height);
                         //相机旋转90度
                         if (manager != null) {
-//                            camera.stopPreview();
-                            camera.setDisplayOrientation(90);
-                            //配置camera参数
-                            camera.setParameters(parameters);
-//                            camera.startPreview();
+//                            CAMERA.stopPreview();
+                            CAMERA.setDisplayOrientation(90);
+                            //配置CAMERA参数
+                            CAMERA.setParameters(parameters);
+//                            CAMERA.startPreview();
                             try {
-                                camera.setPreviewDisplay(holder);
+                                CAMERA.setPreviewDisplay(holder);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -240,13 +243,20 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                             }
 
                             //设置监听获取视频流的每一帧
-                            camera.setPreviewCallback(new Camera.PreviewCallback() {
+                            CAMERA.setPreviewCallback(new Camera.PreviewCallback() {
                                 @Override
                                 public void onPreviewFrame(byte[] data, Camera camera) {
                                     if (manager == null || manager.isDisconnecting()) return;
                                     data = rotateYUV420Degree90(data, width, height);
-                                    data = rotateYUV420Degree90(data, height, width);
-                                    data = rotateYUV420Degree90(data, width, height);
+                                    Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+                                    Camera.getCameraInfo(0, cameraInfo);
+                                    if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                                        // 后置摄像头信息
+                                    } else if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
+                                        // 前置摄像头信息
+                                        data = rotateYUV420Degree90(data, height, width);
+                                        data = rotateYUV420Degree90(data, width, height);
+                                    }
                                     YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, height, width, null);
                                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                     yuvimage.compressToJpeg(new Rect(0, 0, height, width), 80, baos);
@@ -257,7 +267,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                                 }
                             });
                             //调用startPreview()用以更新preview的surface
-                            camera.startPreview();
+                            CAMERA.startPreview();
                         }
                     }
                 }).start();
@@ -360,10 +370,10 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
     /**
      * 关闭相机
      */
-    public void releaseCamera(Camera camera) {
-        if (camera != null) {
-            camera.release();
-            camera = null;
+    public void releaseCamera(Camera CAMERA) {
+        if (DetectActivity.this.CAMERA != null) {
+            DetectActivity.this.CAMERA.release();
+            DetectActivity.this.CAMERA = null;
 
         }
     }
@@ -402,7 +412,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
 
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-        releaseCamera(camera);
+        releaseCamera(CAMERA);
     }
 
     @Override
@@ -458,7 +468,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
     @Override
     protected void onPause() {
         super.onPause();
-        releaseCamera(camera);
+        releaseCamera(CAMERA);
     }
 
     @Override

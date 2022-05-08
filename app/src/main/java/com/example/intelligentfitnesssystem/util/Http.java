@@ -56,8 +56,8 @@ public class Http {
     public static String commitLogin(Context context, String phone, String pwd) throws IOException {
         User user = new User();
         user.setPhone(phone);
-//        user.setPwdHex(FileUtils.sha1String(pwd));
-        user.setPwdHex(pwd);
+        user.setPwdHex(FileUtils.sha1String(pwd));
+//        user.setPwdHex(pwd);
         String path = context.getResources().getString(R.string.baseUrl) + context.getResources().getString(R.string.api_login);
         MediaType TYPE = MediaType.parse("application/json;charset=utf-8");
         RequestBody requestBody = RequestBody.Companion.create(JSON.toJSONString(user), TYPE);
