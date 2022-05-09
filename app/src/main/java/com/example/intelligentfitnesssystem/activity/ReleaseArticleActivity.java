@@ -33,6 +33,7 @@ import com.example.intelligentfitnesssystem.util.GlideV4ImageEngine;
 import com.example.intelligentfitnesssystem.util.Http;
 import com.example.intelligentfitnesssystem.util.Loader;
 import com.example.intelligentfitnesssystem.util.Permission;
+import com.google.common.net.MediaType;
 import com.yanzhenjie.alertdialog.AlertDialog;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.PermissionNo;
@@ -181,7 +182,7 @@ public class ReleaseArticleActivity extends AppCompatActivity {
             @Override
             public void addOnClickListener(int remainNum) {
                 Matisse.from(ReleaseArticleActivity.this)
-                        .choose(Type != null && Type.equals("photo") ? MimeType.ofImage() : MimeType.ofVideo())//指定可选类型为图片或视频
+                        .choose(Type != null && Type.equals("photo") ? MimeType.of(MimeType.GIF, MimeType.JPEG, MimeType.PNG, MimeType.WEBP) : MimeType.of(MimeType.MP4))//指定可选类型为图片或视频
                         .showSingleMediaType(true) //设置显示可选项为指定的类型
                         .countable(true) //设置选择数量标记
                         .maxSelectable(remainNum + 1)  //设置最大选择数量

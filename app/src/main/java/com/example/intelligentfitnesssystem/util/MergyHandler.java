@@ -1,5 +1,9 @@
 package com.example.intelligentfitnesssystem.util;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+
 import java.io.File;
 
 import xyz.mylib.creator.handler.CreatorExecuteResponseHander;
@@ -8,14 +12,14 @@ public class MergyHandler implements CreatorExecuteResponseHander {
 
     LoadingDialog mLoadingDialog;
     String sPath;
-    String dPath;
+    Context context;
 
     public MergyHandler(LoadingDialog loadingDialog,
                         String sPath,
-                        String dPath) {
+                        Context context) {
         this.mLoadingDialog = loadingDialog;
         this.sPath = sPath;
-        this.dPath = dPath;
+        this.context = context;
     }
 
     @Override
@@ -41,10 +45,10 @@ public class MergyHandler implements CreatorExecuteResponseHander {
     @Override
     public void onFinish() {
         mLoadingDialog.dismiss();
-        File dfile = new File(dPath);
-        if (dfile.exists()) {
-            dfile.delete();
-        }
-//        FileUtils.copyFile(sPath, dPath);
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File file = new File(sPath);
+        Uri uri = Uri.fromFile(file);
+        intent.setData(uri);
+        context.sendBroadcast(intent);
     }
 }

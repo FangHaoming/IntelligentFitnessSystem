@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ import com.example.intelligentfitnesssystem.R;
 import com.example.intelligentfitnesssystem.bean.MyResponse;
 import com.example.intelligentfitnesssystem.bean.User;
 import com.example.intelligentfitnesssystem.util.Http;
+import com.example.intelligentfitnesssystem.util.Tools;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -136,6 +138,23 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     listViewHolder.content_text.setText(article.getText());
                 }
                 if (article.getImg().length > 0 && !article.getImg()[0].split("\\.")[1].equals("mp4")) {
+                    switch (article.getImg().length) {
+                        case 1:
+                            LinearLayout.LayoutParams Params =  (LinearLayout.LayoutParams)listViewHolder.img_0.getLayoutParams();
+                            Params.height = Tools.dip2px(mContext,200);
+                            listViewHolder.img_0.setLayoutParams(Params);
+                            break;
+                        case 2:
+                            LinearLayout.LayoutParams Params0 =  (LinearLayout.LayoutParams)listViewHolder.img_0.getLayoutParams();
+                            Params0.height = Tools.dip2px(mContext,150);
+                            listViewHolder.img_0.setLayoutParams(Params0);
+                            LinearLayout.LayoutParams Params1 =  (LinearLayout.LayoutParams)listViewHolder.img_1.getLayoutParams();
+                            Params1.height = Tools.dip2px(mContext,150);
+                            listViewHolder.img_0.setLayoutParams(Params1);
+                            break;
+                        default:
+                            break;
+                    }
                     if (article.getImg()[0] != null) {
                         listViewHolder.img_0.setVisibility(View.VISIBLE);
                         Glide.with(mContext)

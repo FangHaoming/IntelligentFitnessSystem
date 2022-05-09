@@ -289,7 +289,6 @@ public class CommunityFragment extends Fragment {
                         for (Object object : jsonArray) {
                             list.add(JSONObject.parseObject(((JSONObject) object).toJSONString(), Article.class));
                         }
-                        System.out.println("*****article " + JSON.toJSONString(list.get(0)));
                     }
                 }
                 requireActivity().runOnUiThread(new Runnable() {

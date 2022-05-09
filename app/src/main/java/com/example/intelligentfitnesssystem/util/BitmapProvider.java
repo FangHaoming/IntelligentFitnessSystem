@@ -57,6 +57,6 @@ public class BitmapProvider implements IProviderExpand<Bitmap> {
     public Bitmap next() {
         byte[] bytes = queue.poll();
         index++;
-        return BitmapFactory.decodeByteArray(list.get(index).getData(), 0, list.get(index).getData().length);
+        return BitmapFactory.decodeByteArray(list.get(index-1).getData(), 0, list.get(index-1).getData().length);
     }
 }

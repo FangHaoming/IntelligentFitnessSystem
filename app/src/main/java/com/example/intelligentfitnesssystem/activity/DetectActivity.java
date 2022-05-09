@@ -11,6 +11,8 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.storage.StorageManager;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
@@ -47,7 +49,9 @@ import com.yanzhenjie.permission.PermissionNo;
 import com.yanzhenjie.permission.PermissionYes;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.Socket;
 import java.nio.ByteOrder;
 import java.util.LinkedList;
@@ -108,9 +112,9 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 if (isBegin) {
                     //record
                     binding.sfv.setVisibility(View.VISIBLE);
-                    initOkSocket("172.16.179.141", 8004, type);
-                    manager.connect();
-//                    requestSocket(type);
+//                    initOkSocket("172.16.179.141", 8004, type);
+//                    manager.connect();
+                    requestSocket(type);
                     binding.switchBtn.setImageResource(R.drawable.stop);
                     binding.download.setVisibility(View.GONE);
                     isBegin = false;
@@ -252,7 +256,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                                     Camera.getCameraInfo(0, cameraInfo);
                                     if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                                         // 后置摄像头信息
-                                    } else if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
+                                    } else if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
                                         // 前置摄像头信息
                                         data = rotateYUV420Degree90(data, height, width);
                                         data = rotateYUV420Degree90(data, width, height);
@@ -339,13 +343,19 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
      * 保存解析后的视频到本地
      */
     void saveVideo() {
+        if (videoFrameList.size() <= 0) {
+            Toast.makeText(DetectActivity.this, "拍摄视频时间过短", Toast.LENGTH_SHORT).show();
+            return;
+        }
         mLoadingDialog.show(getSupportFragmentManager());
         String name = FileUtils.sha1String(videoFrameList.get(0).getData()) + ".mp4";
-        String path = getApplicationContext().getFilesDir().getAbsolutePath();
-        String dpath = getFileStreamPath(name).getPath();
-        CreatorExecuteResponseHander handler = new MergyHandler(mLoadingDialog, dpath, path + "/" + name);
-        AvcExecuteAsyncTask.execute(new BitmapProvider(videoFrameList), 16, handler, dpath);
+        File saveDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "IFS");
+        if (!saveDir.exists()) saveDir.mkdir();
+        String PATH = saveDir.getPath() + "/" + name;
+        CreatorExecuteResponseHander handler = new MergyHandler(mLoadingDialog, PATH, this);
+        AvcExecuteAsyncTask.execute(new BitmapProvider(videoFrameList), 1, handler, PATH);
     }
+
 
     /**
      * 获取设备支持的最小分辨率

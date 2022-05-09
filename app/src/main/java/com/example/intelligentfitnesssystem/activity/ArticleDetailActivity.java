@@ -11,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -34,6 +35,7 @@ import com.example.intelligentfitnesssystem.util.AppManager;
 import com.example.intelligentfitnesssystem.util.EditIsCanUseBtnUtils;
 import com.example.intelligentfitnesssystem.util.Http;
 import com.example.intelligentfitnesssystem.util.SoftKeyBoardListener;
+import com.example.intelligentfitnesssystem.util.Tools;
 
 import static com.example.intelligentfitnesssystem.MyApplication.From;
 import static com.example.intelligentfitnesssystem.MyApplication.commentId;
@@ -349,6 +351,23 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 binding.contentVideo.bind(getString(R.string.baseUrl) + getString(R.string.api_get_img) + getString(R.string.api_get_articleImg) + article.getImg()[0]);
             } else {
                 ImageView[] imageViews = {binding.image1, binding.image2, binding.image3, binding.image4, binding.image5, binding.image6, binding.image7, binding.image8, binding.image9};
+                switch (article.getImg().length) {
+                    case 1:
+                        LinearLayout.LayoutParams Params = (LinearLayout.LayoutParams) imageViews[0].getLayoutParams();
+                        Params.height = Tools.dip2px(this, 300);
+                        imageViews[0].setLayoutParams(Params);
+                        break;
+                    case 2:
+                        LinearLayout.LayoutParams Params0 = (LinearLayout.LayoutParams) imageViews[0].getLayoutParams();
+                        Params0.height = Tools.dip2px(this, 150);
+                        imageViews[0].setLayoutParams(Params0);
+                        LinearLayout.LayoutParams Params1 = (LinearLayout.LayoutParams) imageViews[1].getLayoutParams();
+                        Params1.height = Tools.dip2px(this, 150);
+                        imageViews[1].setLayoutParams(Params1);
+                        break;
+                    default:
+                        break;
+                }
                 for (int i = 0; i < article.getImg().length; i++) {
                     imageViews[i].setVisibility(View.VISIBLE);
                     Glide.with(ArticleDetailActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + getString(R.string.api_get_articleImg) + article.getImg()[i]).into(imageViews[i]);
