@@ -112,9 +112,9 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                 if (isBegin) {
                     //record
                     binding.sfv.setVisibility(View.VISIBLE);
-//                    initOkSocket("172.16.179.141", 8004, type);
-//                    manager.connect();
-                    requestSocket(type);
+                    initOkSocket("172.16.179.141", 8004, type);
+                    manager.connect();
+//                    requestSocket(type);
                     binding.switchBtn.setImageResource(R.drawable.stop);
                     binding.download.setVisibility(View.GONE);
                     isBegin = false;
@@ -353,7 +353,7 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
         if (!saveDir.exists()) saveDir.mkdir();
         String PATH = saveDir.getPath() + "/" + name;
         CreatorExecuteResponseHander handler = new MergyHandler(mLoadingDialog, PATH, this);
-        AvcExecuteAsyncTask.execute(new BitmapProvider(videoFrameList), 1, handler, PATH);
+        AvcExecuteAsyncTask.execute(new BitmapProvider(videoFrameList), 16, handler, PATH);
     }
 
 

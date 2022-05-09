@@ -228,6 +228,11 @@ public class ReleaseArticleActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -251,7 +256,25 @@ public class ReleaseArticleActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 imgData.add(img_data);
-                img.add(realPath.split("/")[realPath.split("/").length - 1]);
+                String imgName = realPath.split("/")[realPath.split("/").length - 1];
+                if (
+                        Type != null && Type.equals("photo") &&
+                                !imgName.split("\\.")[1].equals("png") &&
+                                !imgName.split("\\.")[1].equals("jpg") &&
+                                !imgName.split("\\.")[1].equals("webp") &&
+                                !imgName.split("\\.")[1].equals("gif")
+                ) {
+                    if (imgName.contains("jpg") || imgName.contains("jpeg")) imgName = imgName.split("\\.")[0] + ".jpg";
+                    else if (imgName.contains("png")) imgName = imgName.split("\\.")[0] + ".png";
+                    else if (imgName.contains("webp")) imgName = imgName.split("\\.")[0] + ".webp";
+                    else imgName = imgName.split("\\.")[0] + ".png";
+                } else if (
+                        Type != null && Type.equals("video") &&
+                                !imgName.split("\\.")[1].equals("mp4")
+                ) {
+                    imgName = imgName.split("\\.")[0] + ".mp4";
+                }
+                img.add(imgName);
             }
             paramsArticle.setImgData(imgData.toArray(new byte[imgData.size()][]));
             paramsArticle.setImg(img.toArray(new String[img.size()]));

@@ -61,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("*****Main resume");
+        String imgName = "asdfdsag.tencent";
+        imgName = imgName.replace(imgName.split("\\.")[1], "png");
+        System.out.println("*****Main resume"+imgName.contains("as"));
         updateUser(MainActivity.this);
     }
 }

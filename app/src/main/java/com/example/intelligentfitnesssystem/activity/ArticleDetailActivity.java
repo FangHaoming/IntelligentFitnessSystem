@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.PersistableBundle;
@@ -46,6 +47,8 @@ import static java.util.Arrays.sort;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -332,7 +335,11 @@ public class ArticleDetailActivity extends AppCompatActivity {
         sort(temp);
         isPraise = -1 != binarySearch(temp, localUser.getId());
         if (article.getPublisherImg() != null) {
-            Glide.with(ArticleDetailActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + article.getPublisherImg()).into(binding.head);
+            try {
+                Glide.with(ArticleDetailActivity.this).load(new URL(getString(R.string.baseUrl) + getString(R.string.api_get_img) + article.getPublisherImg())).into(binding.head);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
         if (isPraise) {
             binding.praise.setBackground(ContextCompat.getDrawable(ArticleDetailActivity.this, R.drawable.praise_clicked));
@@ -370,7 +377,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
                 }
                 for (int i = 0; i < article.getImg().length; i++) {
                     imageViews[i].setVisibility(View.VISIBLE);
-                    Glide.with(ArticleDetailActivity.this).load(getString(R.string.baseUrl) + getString(R.string.api_get_img) + getString(R.string.api_get_articleImg) + article.getImg()[i]).into(imageViews[i]);
+                    Glide.with(ArticleDetailActivity.this).load(Uri.parse(getString(R.string.baseUrl) + getString(R.string.api_get_img) + getString(R.string.api_get_articleImg) + article.getImg()[i])).disallowHardwareConfig().into(imageViews[i]);
                 }
             }
         }
