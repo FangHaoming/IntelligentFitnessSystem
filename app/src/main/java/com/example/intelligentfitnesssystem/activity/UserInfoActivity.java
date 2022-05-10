@@ -62,29 +62,36 @@ public class UserInfoActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                        MyResponse<User> result = JSON.parseObject(Http.getUserInfo(UserInfoActivity.this, user_0.getPhone()), (Type) MyResponse.class);
-                        switch (result.getStatus()) {
-                            case 0:
-                                user = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        updateView();
-                                    }
-                                });
-                                break;
-                            case 1:
-                                Looper.prepare();
-                                Toast.makeText(UserInfoActivity.this, getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
-                                Looper.loop();
-                                break;
+                        MyResponse<User> result = null;
+                        if (user_0.getPhone() != null && !user_0.getPhone().equals("")) {
+                            result = JSON.parseObject(Http.getUserInfo(UserInfoActivity.this, user_0.getPhone()), (Type) MyResponse.class);
+                        } else if (user_0.getId() >= 0) {
+                            result = JSON.parseObject(Http.getUserInfo(UserInfoActivity.this, user_0.getId()), (Type) MyResponse.class);
+                        }
+                        if (result != null) {
+                            switch (result.getStatus()) {
+                                case 0:
+                                    user = JSON.parseObject(JSON.toJSONString(result.getData()), User.class);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            updateView();
+                                        }
+                                    });
+                                    break;
+                                case 1:
+                                    Looper.prepare();
+                                    Toast.makeText(UserInfoActivity.this, getResources().getString(R.string.info_error_server), Toast.LENGTH_SHORT).show();
+                                    Looper.loop();
+                                    break;
+                            }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }).start();
-        }else if(user_0 != null){
+        } else if (user_0 != null) {
             user = user_0;
             updateView();
         }

@@ -104,6 +104,10 @@ public class ArticleDetailActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             if (!AppManager.isDestroy(ArticleDetailActivity.this)) {
+                                if(article.getCommentCount()>0){
+                                    binding.commentView.setVisibility(View.GONE);
+                                    binding.recyclerView.setVisibility(View.VISIBLE);
+                                }
                                 binding.recyclerView.setLayoutManager(new LinearLayoutManager(ArticleDetailActivity.this));
                                 binding.recyclerView.setAdapter(commentAdapter);
                                 updateView();
@@ -175,7 +179,16 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
             }
         });
-
+        binding.head.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ArticleDetailActivity.this, UserInfoActivity.class);
+                User paramUser = new User(article.getUserId());
+                intent.putExtra("User", JSON.toJSONString(paramUser));
+                startActivity(intent);
+                finish();
+            }
+        });
         binding.share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -280,6 +293,8 @@ public class ArticleDetailActivity extends AppCompatActivity {
                                         @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
                                         @Override
                                         public void run() {
+                                            binding.commentView.setVisibility(View.GONE);
+                                            binding.recyclerView.setVisibility(View.VISIBLE);
                                             article.setCommentCount((article.getCommentCount() + 1));
                                             binding.commentNum.setText(String.valueOf(article.getCommentCount()));
                                             binding.commentAreaNum.setText("评论(" + article.getCommentCount() + ")");
