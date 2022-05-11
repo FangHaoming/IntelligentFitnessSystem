@@ -211,13 +211,13 @@ public class DetectActivity extends AppCompatActivity implements SurfaceHolder.C
                         Camera.Parameters parameters = CAMERA.getParameters();
                         //获取相机支持的预览的大小
                         DisplayMetrics dm = getResources().getDisplayMetrics();
-//                        Camera.Size previewSize=getCameraPreviewSize(parameters);
-                        Camera.Size previewSize = getBestCameraResolution(parameters, getScreenMetrics(DetectActivity.this));
-                        int width = previewSize.width;
-                        int height = previewSize.height;
-                        System.out.println("*****w&h:" + width + " " + height);
-//                        int width = 640;
-//                        int height = 480;
+                        Camera.Size previewSize=getCameraPreviewSize(parameters);
+//                        Camera.Size previewSize = getBestCameraResolution(parameters, getScreenMetrics(DetectActivity.this));
+//                        int width = previewSize.width;
+//                        int height = previewSize.height;
+//                        System.out.println("*****w&h:" + width + " " + height);
+                        int width = 640;
+                        int height = 480;
 //                        int width =dm.widthPixels;// previewSizFe.width; //640
 //                        int height = dm.heightPixels;// previewSize.height;//480
                         //设置预览格式（也就是每一帧的视频格式）YUV420下的NV21
