@@ -85,7 +85,7 @@
                 android:layout_height="100dp"
                 android:layout_marginHorizontal="2dp"
                 android:layout_weight="1"
-                android:scaleType="center"
+                android:scaleType="centerCrop"
                 android:contentDescription="@string/nothing"
                 android:visibility="gone" />
 
@@ -95,14 +95,14 @@
                 android:layout_height="100dp"
                 android:layout_marginHorizontal="2dp"
                 android:layout_weight="1"
-                android:scaleType="center"
+                android:scaleType="centerCrop"
                 android:contentDescription="@string/nothing"
                 android:src="@drawable/user_img"
                 android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/image_2"
-                android:scaleType="center"
+                android:scaleType="centerCrop"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginHorizontal="2dp"
